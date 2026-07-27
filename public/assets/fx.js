@@ -42,17 +42,18 @@
   }
 
   /* Et piano har 2–3 strenger per tone. Stemt: strengene ligger oppå
-     hverandre. Ustemt: de spriker — og det er sprikene man hører som svev. */
-  function playString(freq, spread, delay) {
-    playNote(freq, { detune: -spread / 2, delay: delay, gain: 0.11 });
-    playNote(freq, { detune: spread / 2, delay: delay, gain: 0.11 });
+     hverandre. Ustemt: strengeparene spriker (svev) OG tonene har drevet
+     skjevt i forhold til hverandre (center-avvik i cent). */
+  function playString(freq, center, spread, delay) {
+    playNote(freq, { detune: center - spread / 2, delay: delay, gain: 0.11 });
+    playNote(freq, { detune: center + spread / 2, delay: delay, gain: 0.11 });
   }
 
-  var CHORD = [261.63, 329.63, 392.0, 523.25]; /* C4 E4 G4 C5 */
+  var CHORD = [261.63, 329.63, 392.0, 523.25]; /* C-dur: C4 E4 G4 C5 */
 
-  function playChord(spreads) {
+  function playChord(centers, spreads) {
     CHORD.forEach(function (freq, i) {
-      playString(freq, spreads[i], i * 0.045);
+      playString(freq, centers[i], spreads[i], i * 0.045);
     });
   }
 
@@ -63,11 +64,12 @@
     setTimeout(function () { btn.classList.remove('is-playing'); }, 2400);
   }
   if (btnSur) btnSur.addEventListener('click', function () {
-    playChord([26, 34, 22, 30]); /* store sprik per tone → tydelig svev */
+    /* tonene drar hver sin vei + store sprik i strengeparene → skikkelig surt */
+    playChord([-16, 22, -10, 18], [48, 62, 44, 56]);
     flash(btnSur);
   });
   if (btnRen) btnRen.addEventListener('click', function () {
-    playChord([2, 2, 2, 2]); /* nesten samstemt → ren klang */
+    playChord([0, 0, 0, 0], [2, 2, 2, 2]); /* samstemt → ren klang */
     flash(btnRen);
   });
 
