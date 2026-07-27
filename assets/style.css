@@ -118,7 +118,7 @@ textarea:focus-visible {
 }
 .section-alt {
   max-width: none;
-  background: #f1ebe0;
+  background: var(--ivory-dark);
 }
 .section-inner { max-width: 61rem; margin: 0 auto; }
 .section h2 { font-size: clamp(1.6rem, 4vw, 2.25rem); }
@@ -248,7 +248,10 @@ textarea:focus-visible {
   .logo { height: 46px; }
 }
 
+html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; transition: none !important; }
 }
-html { scroll-behavior: smooth; }
+
+/* Plassholder som venter på bekreftelse fra Stemmeren (fjernes i #6) */
+.tbd { border-bottom: 1px dashed var(--felt); }

@@ -1,0 +1,3 @@
+# Nedtonet hobbyposisjonering
+
+Supersederer ADR-0001. Frode besluttet (på vegne av Geir, 2026-07-27) at siden ikke skal nevne at Geir er selvlært eller driver stemming som hobby — verken i hero, om-tekst eller sitater. Tonen forblir varm og jordnær, og vi lover fortsatt ikke «profesjonell» kvalitet eller sertifiseringer; vi lar rett og slett være å bringe bakgrunnen opp. Spør en pianoeier direkte, svarer Geir ærlig i dialogen — ærligheten er flyttet fra markedsføringen til samtalen. Konsekvens: Geirs opprinnelige Facebook-sitat («…jeg er selvlært og har dette som hobby…») skal ikke brukes på siden.

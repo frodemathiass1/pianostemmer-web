@@ -1,6 +1,6 @@
 # Pianostemmer'n
 
-Landingsside for Geir Barlaups pianostemmer-tjeneste i Eidsberg. Siden skal gjøre det lett for pianoeiere i området å sende en henvendelse, og posisjonerer Geir ærlig som selvlært hobbystemmer med godt øre.
+Landingsside for Geir Barlaups pianostemmer-tjeneste i Eidsberg. Siden skal gjøre det lett for pianoeiere i området å sende en henvendelse, med en varm og jordnær tone (se ADR-0002).
 
 ## Language
 
@@ -24,9 +24,9 @@ _Avoid_: kunde (tvetydig — Frode omtaler Geir som «kunden» i prosjektet), br
 Området Stemmeren betjener: Eidsberg med omland, kjøring utover det etter avtale.
 _Avoid_: region, marked
 
-**Hobbystemmer**:
-Posisjoneringen: selvlært, driver med stemming som hobby, kommuniseres åpent og innrammet som en styrke (lidenskap, godt øre, hyggelig pris).
-_Avoid_: amatør (negativt ladet), profesjonell (lover for mye)
+**Mekanikk**:
+Pianoets bevegelige spillverk (hammere, dempere osv.); justering/reparasjon av den er ikke del av Stemmingen og prises i tillegg.
+_Avoid_: reparasjon (bredere begrep)
 
 **Plassholder**:
 Innhold på siden som venter på bekreftelse fra Stemmeren (f.eks. pris, dekningsområde), tydelig merket i koden til det er erstattet.

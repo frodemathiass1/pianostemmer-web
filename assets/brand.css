@@ -4,6 +4,7 @@
    varm og jordnær, ikke corporate). */
 :root {
   --ivory: #faf6ef; /* bakgrunn — gammelt elfenben */
+  --ivory-dark: #f1ebe0; /* alternerende seksjonsbakgrunn */
   --ebony: #211d19; /* tekst og tangenter — varm nesten-sort */
   --felt: #9e3b2b; /* aksent — stemmefilt-rød; lenker, knapper, apostrof */
   --felt-dark: #7f2f22; /* hover/aktiv på aksentelementer */

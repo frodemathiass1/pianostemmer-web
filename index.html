@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Pianostemmer'n — pianostemming i Eidsberg</title>
-  <meta name="description" content="Geir Barlaup stemmer pianoet ditt hjemme hos deg i Eidsberg og omegn. Selvlært, godt øre og hyggelig pris — han etterlater seg rene toner.">
+  <meta name="description" content="Geir Barlaup stemmer pianoet ditt hjemme hos deg i Eidsberg og omegn. Godt øre, god tid og hyggelig pris — han etterlater seg rene toner.">
   <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
   <link rel="stylesheet" href="assets/brand.css">
   <link rel="stylesheet" href="assets/style.css">
@@ -14,7 +14,7 @@
   <header class="site-header">
     <img src="assets/logo.svg" alt="Pianostemmer'n — rene toner" class="logo">
     <nav aria-label="Hovedmeny">
-      <a href="#tjenester">Slik foregår det</a>
+      <a href="#slik-foregar-det">Slik foregår det</a>
       <a href="#priser">Pris</a>
       <a href="#om">Om stemmeren</a>
       <a href="#kontakt" class="nav-cta">Kontakt</a>
@@ -26,9 +26,9 @@
       <p class="eyebrow">Pianostemming i Eidsberg</p>
       <h1>«Jeg kan stemme pianoet ditt.»</h1>
       <p class="lead">
-        Geir Barlaup er selvlært pianostemmer med godt øre, god tid og hyggelig
-        pris. Han kommer hjem til deg, tar seg av instrumentet ditt — og
-        etterlater seg rene toner.
+        Geir Barlaup stemmer pianoer i Eidsberg og omegn — med godt øre, god
+        tid og hyggelig pris. Han kommer hjem til deg, tar seg av instrumentet
+        ditt, og etterlater seg rene toner.
       </p>
       <div class="hero-actions">
         <a href="#kontakt" class="btn">Send en henvendelse</a>
@@ -36,7 +36,7 @@
       </div>
     </section>
 
-    <section id="tjenester" class="section">
+    <section id="slik-foregar-det" class="section">
       <p class="eyebrow">Slik foregår det</p>
       <h2>Fra sur til ren — i tre steg</h2>
       <ol class="steps">
@@ -65,9 +65,12 @@
       <div class="price-card">
         <div class="price-row">
           <span class="price-name">Pianostemming, hjemme hos deg</span>
-          <!-- TBD(pris): bekreftes av Geir, se issue #3 -->
-          <span class="price-amount tbd" data-tbd="pris">kr&nbsp;—</span>
+          <span class="price-amount">kr&nbsp;2&nbsp;500</span>
         </div>
+        <p class="price-note">
+          Trenger mekanikken justering eller reparasjon, kommer det i tillegg —
+          avtales alltid med deg først.
+        </p>
         <!-- TBD(dekningsomraade): bekreftes av Geir, se issue #3 -->
         <p class="price-note tbd" data-tbd="dekningsomraade">
           Gjelder Eidsberg med omland. Kjøring lenger unna? Ta kontakt, så finner
@@ -82,17 +85,13 @@
         <img src="assets/geir-stemmer.jpg" alt="Geir Barlaup stemmer et åpent piano med stemmenøkkel" class="about-photo">
         <div class="about-text">
           <p class="eyebrow">Om stemmeren</p>
-          <h2>Selvlært — med øre for rene toner</h2>
+          <h2>Godt øre for rene toner</h2>
           <p>
-            Geir har lært seg pianostemming på egen hånd og driver med det som
-            hobby, ikke som fabrikk. Det betyr to ting for deg: han tar seg god
-            tid med instrumentet ditt, og prisen er hyggeligere enn hos de
-            profesjonelle. Han sier det best selv:
+            Geir Barlaup holder til i Eidsberg og stemmer pianoer hjemme hos
+            folk i hele distriktet. Han er genuint glad i instrumentet, tar seg
+            god tid med hvert eneste piano, og gir seg ikke før det klinger
+            rent — til en pris det går an å si ja til.
           </p>
-          <blockquote>
-            «Gjør oppmerksom på at jeg er selvlært og har dette som hobby. Vil
-            allikevel si at jeg etterlater meg rene toner.»
-          </blockquote>
         </div>
       </div>
     </section>
@@ -108,7 +107,7 @@
         <a href="mailto:geir_barlaup@hotmail.com">geir_barlaup@hotmail.com</a>.
       </p>
 
-      <form name="kontakt" method="POST" action="/takk.html" data-netlify="true" netlify-honeypot="bot-field" class="contact-form">
+      <form name="kontakt" method="POST" action="takk.html" data-netlify="true" netlify-honeypot="bot-field" class="contact-form">
         <input type="hidden" name="form-name" value="kontakt">
         <p class="hp-field" aria-hidden="true">
           <label>Ikke fyll ut dette feltet: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
@@ -120,7 +119,7 @@
           </p>
           <p>
             <label for="telefon">Telefon</label>
-            <input id="telefon" name="telefon" type="tel" required autocomplete="tel">
+            <input id="telefon" name="telefon" type="tel" required autocomplete="tel" pattern="[0-9+ ]{8,}" title="Skriv inn et telefonnummer, minst 8 sifre">
           </p>
           <p>
             <label for="epost">E-post</label>
