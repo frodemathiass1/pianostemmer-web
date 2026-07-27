@@ -64,8 +64,14 @@
     setTimeout(function () { btn.classList.remove('is-playing'); }, 2400);
   }
   if (btnSur) btnSur.addEventListener('click', function () {
-    /* tonene drar hver sin vei + store sprik i strengeparene → skikkelig surt */
-    playChord([-16, 22, -10, 18], [48, 62, 44, 56]);
+    /* Semitone-nivå surt: tonene ligger opptil godt over et halvt trinn
+       skjevt (100 cent = én semitone), med stort svev i strengeparene og
+       litt tilfeldig slingring per klikk — som et ekte vrak av et piano. */
+    var jitter = function (base) { return base + (Math.random() - 0.5) * 40; };
+    playChord(
+      [jitter(-120), jitter(90), jitter(-70), jitter(140)],
+      [60, 75, 55, 70]
+    );
     flash(btnSur);
   });
   if (btnRen) btnRen.addEventListener('click', function () {
