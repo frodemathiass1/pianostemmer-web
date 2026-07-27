@@ -1,0 +1,14 @@
+/* Pianostemmer'n — merkevarepalett.
+   Elfenben/ibenholt fra tangentene; aksenten er filt-rød — den røde
+   filtstripen stemmere legger mellom strengene under stemming (ADR-0001:
+   varm og jordnær, ikke corporate). */
+:root {
+  --ivory: #faf6ef; /* bakgrunn — gammelt elfenben */
+  --ebony: #211d19; /* tekst og tangenter — varm nesten-sort */
+  --felt: #9e3b2b; /* aksent — stemmefilt-rød; lenker, knapper, apostrof */
+  --felt-dark: #7f2f22; /* hover/aktiv på aksentelementer */
+  --ink-soft: #6b6259; /* dempet tekst — tagline, metadata */
+
+  --font-display: Georgia, 'Times New Roman', serif; /* overskrifter og navnetrekk */
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
