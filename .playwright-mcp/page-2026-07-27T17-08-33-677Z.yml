@@ -1,0 +1,7 @@
+- main [ref=f2e2]:
+  - img "Pianostemmer'n" [ref=f2e3]
+  - heading "Henvendelsen er sendt" [level=1] [ref=f2e4]
+  - paragraph [ref=f2e5]: Takk! Geir tar kontakt så snart han kan — som regel i løpet av et par dager.
+  - paragraph [ref=f2e6]:
+    - link "Tilbake til siden" [ref=f2e7] [cursor=pointer]:
+      - /url: /

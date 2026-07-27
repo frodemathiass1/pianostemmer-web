@@ -1,0 +1,7 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]: Lockup (header-størrelse)
+  - generic [ref=e5]:
+    - generic [ref=e6]: Mark 64px
+    - generic [ref=e9]: Mark 32px
+    - generic [ref=e12]: Mark 16px (favicon)
+    - generic [ref=e15]: Mot mørk bakgrunn

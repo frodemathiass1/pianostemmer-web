@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pianostemmer'n — pianostemming i Eidsberg</title>
+  <meta name="description" content="Geir Barlaup stemmer pianoet ditt hjemme hos deg i Eidsberg og omegn. Selvlært, godt øre og hyggelig pris — han etterlater seg rene toner.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
+  <link rel="stylesheet" href="assets/brand.css">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <img src="assets/logo.svg" alt="Pianostemmer'n — rene toner" class="logo">
+    <nav aria-label="Hovedmeny">
+      <a href="#tjenester">Slik foregår det</a>
+      <a href="#priser">Pris</a>
+      <a href="#om">Om stemmeren</a>
+      <a href="#kontakt" class="nav-cta">Kontakt</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Pianostemming i Eidsberg</p>
+      <h1>«Jeg kan stemme pianoet ditt.»</h1>
+      <p class="lead">
+        Geir Barlaup er selvlært pianostemmer med godt øre, god tid og hyggelig
+        pris. Han kommer hjem til deg, tar seg av instrumentet ditt — og
+        etterlater seg rene toner.
+      </p>
+      <div class="hero-actions">
+        <a href="#kontakt" class="btn">Send en henvendelse</a>
+        <a href="tel:+4792214793" class="btn btn-ghost">Ring 922&nbsp;14&nbsp;793</a>
+      </div>
+    </section>
+
+    <section id="tjenester" class="section">
+      <p class="eyebrow">Slik foregår det</p>
+      <h2>Fra sur til ren — i tre steg</h2>
+      <ol class="steps">
+        <li>
+          <h3>Du tar kontakt</h3>
+          <p>Send en henvendelse med skjemaet under, eller ring. Fortell gjerne
+          litt om pianoet og hvor det står.</p>
+        </li>
+        <li>
+          <h3>Geir kommer hjem til deg</h3>
+          <p>Stemmingen skjer der pianoet står. Han går gjennom instrumentet
+          streng for streng og tar den tiden som trengs.</p>
+        </li>
+        <li>
+          <h3>Pianoet klinger rent</h3>
+          <p>Du kan sette deg ned og spille med det samme — på et piano som
+          endelig låter slik det skal.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section id="priser" class="section section-alt">
+      <div class="section-inner">
+      <p class="eyebrow">Pris</p>
+      <h2>Én tjeneste, én pris</h2>
+      <div class="price-card">
+        <div class="price-row">
+          <span class="price-name">Pianostemming, hjemme hos deg</span>
+          <!-- TBD(pris): bekreftes av Geir, se issue #3 -->
+          <span class="price-amount tbd" data-tbd="pris">kr&nbsp;—</span>
+        </div>
+        <!-- TBD(dekningsomraade): bekreftes av Geir, se issue #3 -->
+        <p class="price-note tbd" data-tbd="dekningsomraade">
+          Gjelder Eidsberg med omland. Kjøring lenger unna? Ta kontakt, så finner
+          dere ut av det.
+        </p>
+      </div>
+      </div>
+    </section>
+
+    <section id="om" class="section">
+      <div class="about">
+        <img src="assets/geir-stemmer.jpg" alt="Geir Barlaup stemmer et åpent piano med stemmenøkkel" class="about-photo">
+        <div class="about-text">
+          <p class="eyebrow">Om stemmeren</p>
+          <h2>Selvlært — med øre for rene toner</h2>
+          <p>
+            Geir har lært seg pianostemming på egen hånd og driver med det som
+            hobby, ikke som fabrikk. Det betyr to ting for deg: han tar seg god
+            tid med instrumentet ditt, og prisen er hyggeligere enn hos de
+            profesjonelle. Han sier det best selv:
+          </p>
+          <blockquote>
+            «Gjør oppmerksom på at jeg er selvlært og har dette som hobby. Vil
+            allikevel si at jeg etterlater meg rene toner.»
+          </blockquote>
+        </div>
+      </div>
+    </section>
+
+    <section id="kontakt" class="section section-alt">
+      <div class="section-inner">
+      <p class="eyebrow">Kontakt</p>
+      <h2>Send en henvendelse</h2>
+      <p class="section-intro">
+        Fortell kort om pianoet ditt og hvor det står, så tar Geir kontakt.
+        Du kan også nå ham direkte på
+        <a href="tel:+4792214793">922&nbsp;14&nbsp;793</a> eller
+        <a href="mailto:geir_barlaup@hotmail.com">geir_barlaup@hotmail.com</a>.
+      </p>
+
+      <form name="kontakt" method="POST" action="/takk.html" data-netlify="true" netlify-honeypot="bot-field" class="contact-form">
+        <input type="hidden" name="form-name" value="kontakt">
+        <p class="hp-field" aria-hidden="true">
+          <label>Ikke fyll ut dette feltet: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
+        </p>
+        <div class="form-grid">
+          <p>
+            <label for="navn">Navn</label>
+            <input id="navn" name="navn" type="text" required autocomplete="name">
+          </p>
+          <p>
+            <label for="telefon">Telefon</label>
+            <input id="telefon" name="telefon" type="tel" required autocomplete="tel">
+          </p>
+          <p>
+            <label for="epost">E-post</label>
+            <input id="epost" name="epost" type="email" required autocomplete="email">
+          </p>
+          <p>
+            <label for="sted">Sted</label>
+            <input id="sted" name="sted" type="text" required autocomplete="address-level2" placeholder="F.eks. Mysen">
+          </p>
+        </div>
+        <p>
+          <label for="melding">Melding</label>
+          <textarea id="melding" name="melding" rows="5" required placeholder="Fortell gjerne litt om pianoet — merke, alder, og når det sist ble stemt."></textarea>
+        </p>
+        <p>
+          <button type="submit" class="btn">Send henvendelsen</button>
+        </p>
+      </form>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <img src="assets/logo-mark.svg" alt="" class="footer-mark" width="36" height="36">
+    <p>
+      Pianostemmer'n · Geir Barlaup<br>
+      Rakkestadveien 1244, 1880 Eidsberg<br>
+      <a href="tel:+4792214793">922 14 793</a> ·
+      <a href="mailto:geir_barlaup@hotmail.com">geir_barlaup@hotmail.com</a>
+    </p>
+  </footer>
+
+</body>
+</html>
