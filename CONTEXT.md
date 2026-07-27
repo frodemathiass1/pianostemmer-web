@@ -21,7 +21,7 @@ Den besøkende på siden; en privatperson med et piano som trenger stemming.
 _Avoid_: kunde (tvetydig — Frode omtaler Geir som «kunden» i prosjektet), bruker
 
 **Dekningsområde**:
-Området Stemmeren betjener: Eidsberg med omland, kjøring utover det etter avtale.
+Området Stemmeren betjener: Østfold og Akershus, og resten av landet via jevnlige turnéer — ingen henvendelse avvises på grunn av avstand.
 _Avoid_: region, marked
 
 **Mekanikk**:
