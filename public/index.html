@@ -19,6 +19,7 @@
   <script src="assets/fx.js" defer></script>
 </head>
 <body>
+  <div class="streng" aria-hidden="true"></div>
 
   <!-- Hero-foto: Geert Pieters via Unsplash (Unsplash License, fri kommersiell bruk) -->
   <div class="hero-stage">
@@ -84,6 +85,25 @@
           <button type="button" id="spill-ustemt" class="btn btn-outline">Ustemt piano</button>
           <button type="button" id="spill-stemt" class="btn">Nystemt piano</button>
         </div>
+      </div>
+
+      <div class="demo spill reveal">
+        <h3>Klarer du å stemme selv?</h3>
+        <p>
+          Én streng er sur. Trykk «Spill tonen», lytt etter svevet mot
+          referansetonen, og dra i stemmeskruen til det står helt rent.
+          Det er bokstavelig talt dette Geir driver med — bare med over
+          200 strenger.
+        </p>
+        <div class="spill-rad">
+          <button type="button" id="spill-tone" class="btn">Spill tonen</button>
+          <div class="spill-skrue">
+            <span aria-hidden="true">♭ lavere</span>
+            <input type="range" id="skrue" min="-100" max="100" value="0" step="1" aria-label="Stemmeskrue — juster tonehøyden i cent">
+            <span aria-hidden="true">høyere ♯</span>
+          </div>
+        </div>
+        <p class="spill-status" id="spill-status" aria-live="polite">Trykk «Spill tonen» og lytt etter svevet.</p>
       </div>
     </section>
 

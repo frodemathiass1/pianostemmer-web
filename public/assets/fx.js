@@ -96,6 +96,126 @@
 
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ---------- «Stem pianoet selv»-minispillet ----------
+     En tone starter tilfeldig surt (måltallet er skjult). Skruen legger
+     til/trekker fra cent; står summen på null, er tonen ren mot referansen. */
+  var toneBtn = document.getElementById('spill-tone');
+  var skrue = document.getElementById('skrue');
+  var status = document.getElementById('spill-status');
+  if (toneBtn && skrue && status) {
+    var BASE = 220; /* A3 — svev høres tydelig */
+    var maal = 0, spiller = false, vunnet = false;
+    var oscRef = null, oscBruker = null, gRef = null, gBruker = null;
+
+    function nyRunde() {
+      maal = (Math.random() < 0.5 ? -1 : 1) * (35 + Math.random() * 55);
+      skrue.value = 0;
+      vunnet = false;
+      status.textContent = 'Trykk «Spill tonen» og lytt etter svevet.';
+      toneBtn.textContent = 'Spill tonen';
+    }
+
+    function avvik() { return maal + parseFloat(skrue.value); }
+    function brukerFreq() { return BASE * Math.pow(2, avvik() / 1200); }
+
+    function startTone() {
+      var ac = audio();
+      gRef = ac.createGain(); gBruker = ac.createGain();
+      gRef.gain.value = 0.09; gBruker.gain.value = 0.09;
+      oscRef = ac.createOscillator(); oscRef.frequency.value = BASE;
+      oscBruker = ac.createOscillator(); oscBruker.frequency.value = brukerFreq();
+      oscRef.connect(gRef); gRef.connect(ac.destination);
+      oscBruker.connect(gBruker); gBruker.connect(ac.destination);
+      oscRef.start(); oscBruker.start();
+      spiller = true;
+      toneBtn.textContent = 'Stopp';
+      bedoem();
+    }
+
+    function stoppTone() {
+      if (!spiller) return;
+      var ac = audio();
+      [gRef, gBruker].forEach(function (g) {
+        g.gain.setTargetAtTime(0.0001, ac.currentTime, 0.06);
+      });
+      var r = oscRef, b = oscBruker;
+      setTimeout(function () { r.stop(); b.stop(); }, 300);
+      spiller = false;
+      toneBtn.textContent = vunnet ? 'Ny runde' : 'Spill tonen';
+    }
+
+    function bedoem() {
+      var d = Math.abs(avvik());
+      if (d < 3) {
+        vunnet = true;
+        status.textContent = '🎯 RENT! Du traff innenfor 3 cent — Geir-godkjent.';
+        stoppTone();
+        playChord([0, 0, 0, 0], [2, 2, 2, 2]);
+        toneBtn.textContent = 'Ny runde';
+      } else if (d < 10) {
+        status.textContent = 'Tett på — hører du at svevet bremser?';
+      } else if (d < 25) {
+        status.textContent = 'Nesten! Litt til …';
+      } else if (d < 60) {
+        status.textContent = 'Fortsatt surt. Lytt etter vibben som skal vekk.';
+      } else {
+        status.textContent = 'Au. Prøv andre veien?';
+      }
+    }
+
+    toneBtn.addEventListener('click', function () {
+      if (vunnet && !spiller) { nyRunde(); return; }
+      if (spiller) stoppTone(); else startTone();
+    });
+    skrue.addEventListener('input', function () {
+      if (spiller && oscBruker) {
+        oscBruker.frequency.setTargetAtTime(brukerFreq(), audio().currentTime, 0.02);
+        bedoem();
+      } else if (!vunnet) {
+        status.textContent = 'Trykk «Spill tonen» for å høre hvor du er.';
+      }
+    });
+    nyRunde();
+  }
+
+  /* ---------- Pianostreng-scrollbar ---------- */
+  var streng = document.querySelector('.streng');
+  if (streng) {
+    var strengVenter = false;
+    var stram = function () {
+      var maks = document.documentElement.scrollHeight - window.innerHeight;
+      streng.style.width = (maks > 0 ? (window.scrollY / maks) * 100 : 0) + '%';
+      strengVenter = false;
+    };
+    window.addEventListener('scroll', function () {
+      if (!strengVenter) { strengVenter = true; requestAnimationFrame(stram); }
+    }, { passive: true });
+    stram();
+  }
+
+  /* ---------- Mus-parallax i hero (kun mus/desktop) ---------- */
+  var scene = document.querySelector('.hero-stage');
+  if (scene && !reduced && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    var mx = 0, my = 0, tx = 0, ty = 0, glir = false;
+    scene.addEventListener('mousemove', function (e) {
+      var r = scene.getBoundingClientRect();
+      tx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+      ty = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      if (!glir) { glir = true; requestAnimationFrame(gli); }
+    });
+    function gli() {
+      mx += (tx - mx) * 0.06;
+      my += (ty - my) * 0.06;
+      scene.style.setProperty('--mx', mx.toFixed(4));
+      scene.style.setProperty('--my', my.toFixed(4));
+      if (Math.abs(tx - mx) + Math.abs(ty - my) > 0.002) {
+        requestAnimationFrame(gli);
+      } else {
+        glir = false;
+      }
+    }
+  }
+
   /* ---------- Støv i scenelyset ---------- */
   var canvas = document.querySelector('.stov');
   if (canvas && !reduced) {
