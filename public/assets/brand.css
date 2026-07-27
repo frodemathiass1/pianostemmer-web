@@ -1,14 +1,16 @@
 /* Pianostemmer'n — merkevarepalett.
    Elfenben/ibenholt fra tangentene; aksenten er filt-rød — den røde
-   filtstripen stemmere legger mellom strengene under stemming (ADR-0001:
-   varm og jordnær, ikke corporate). */
+   filtstripen stemmere legger mellom strengene under stemming. Justert for
+   «mørk scene»-uttrykket (#8): dypere ibenholt, mindre rosa i elfenben. */
 :root {
-  --ivory: #faf6ef; /* bakgrunn — gammelt elfenben */
-  --ivory-dark: #f1ebe0; /* alternerende seksjonsbakgrunn */
-  --ebony: #211d19; /* tekst og tangenter — varm nesten-sort */
-  --felt: #9e3b2b; /* aksent — stemmefilt-rød; lenker, knapper, apostrof */
-  --felt-dark: #7f2f22; /* hover/aktiv på aksentelementer */
-  --ink-soft: #6b6259; /* dempet tekst — tagline, metadata */
+  --ivory: #f5f1e8; /* lys bakgrunn — gammelt elfenben, nøytralisert */
+  --ivory-dark: #ebe5d8; /* alternerende seksjonsbakgrunn */
+  --ebony: #1b1613; /* mørk scene — dyp varm nesten-sort */
+  --felt: #a63d2a; /* aksent — stemmefilt-rød; knapper og lenker på lyst */
+  --felt-bright: #c65b41; /* aksent på mørk bakgrunn (kontrast) */
+  --felt-dark: #872f1f; /* hover/aktiv på aksentelementer */
+  --ink-soft: #6d6558; /* dempet tekst på lys bakgrunn */
+  --ivory-soft: #b3a899; /* dempet tekst på mørk bakgrunn */
 
   --font-display: Georgia, 'Times New Roman', serif; /* overskrifter og navnetrekk */
   --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

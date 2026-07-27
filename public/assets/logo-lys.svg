@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 96" role="img" aria-label="Pianostemmer'n — rene toner">
+  <!-- Mark -->
+  <g transform="translate(8 12) scale(1.125)">
+    <rect x="0" y="0" width="64" height="64" rx="14" fill="#F5F1E8"/>
+    <rect x="10" y="13" width="44" height="4.5" rx="2.25" fill="#C65B41"/>
+    <g stroke="#1B1613" stroke-width="1.5" stroke-linecap="round">
+      <line x1="21" y1="44" x2="21" y2="54"/>
+      <line x1="32" y1="44" x2="32" y2="54"/>
+      <line x1="43" y1="44" x2="43" y2="54"/>
+    </g>
+    <g fill="#1B1613">
+      <rect x="17.5" y="24" width="7" height="20" rx="1.5"/>
+      <rect x="28.5" y="24" width="7" height="20" rx="1.5"/>
+      <rect x="39.5" y="24" width="7" height="20" rx="1.5"/>
+    </g>
+  </g>
+  <!-- Wordmark -->
+  <text x="98" y="56" font-family="Georgia, 'Times New Roman', serif" font-weight="700" font-size="38" letter-spacing="-0.5" fill="#F5F1E8">Pianostemmer<tspan fill="#C65B41">’</tspan>n</text>
+  <!-- Tagline -->
+  <text x="100" y="80" font-family="Georgia, 'Times New Roman', serif" font-size="13" letter-spacing="4.5" fill="#B3A899">RENE TONER</text>
+</svg>

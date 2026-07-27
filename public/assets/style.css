@@ -9,8 +9,6 @@ body {
   font-family: var(--font-body);
   font-size: 1.0625rem;
   line-height: 1.6;
-  /* Filtstripen fra logoen løper langs toppen av siden */
-  border-top: 5px solid var(--felt);
 }
 
 h1, h2, h3 {
@@ -24,7 +22,7 @@ a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid var(--felt);
+  outline: 3px solid var(--felt-bright);
   outline-offset: 2px;
 }
 
@@ -37,56 +35,102 @@ textarea:focus-visible {
   margin: 0 0 0.75rem;
 }
 
+/* Mørk scene: header + hero deler bakgrunnsfoto */
+.hero-stage {
+  position: relative;
+  background-color: var(--ebony);
+  background-image:
+    linear-gradient(180deg, rgba(27, 22, 19, 0.72) 0%, rgba(27, 22, 19, 0.35) 45%, rgba(27, 22, 19, 0.82) 100%),
+    url('hero-piano.jpg');
+  background-size: cover;
+  background-position: center 38%;
+  background-attachment: fixed;
+  color: var(--ivory);
+}
+
 /* Header */
 .site-header {
-  max-width: 64rem;
+  max-width: 68rem;
   margin: 0 auto;
-  padding: 1.25rem 1.5rem;
+  padding: 1.5rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
 }
-.logo { height: 56px; width: auto; }
+.logo { height: 52px; width: auto; }
 .site-header nav {
   display: flex;
-  gap: 1.25rem;
+  gap: 1.5rem;
   align-items: center;
   flex-wrap: wrap;
 }
 .site-header nav a {
-  color: var(--ebony);
+  color: var(--ivory);
   text-decoration: none;
   font-size: 0.95rem;
+  opacity: 0.85;
 }
-.site-header nav a:hover { color: var(--felt); }
+.site-header nav a:hover { opacity: 1; color: var(--felt-bright); }
 .site-header .nav-cta {
-  color: var(--felt);
+  color: var(--ivory);
+  opacity: 1;
   font-weight: 600;
+  border: 1.5px solid var(--felt-bright);
+  border-radius: 6px;
+  padding: 0.35rem 0.9rem;
 }
+.site-header .nav-cta:hover { background: var(--felt); border-color: var(--felt); color: var(--ivory); }
 
 /* Hero */
 .hero {
-  max-width: 64rem;
+  max-width: 46rem;
   margin: 0 auto;
-  padding: 4.5rem 1.5rem 5rem;
-  text-align: left;
+  min-height: 78vh;
+  padding: 9vh 1.5rem 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
+.hero .eyebrow { color: var(--felt-bright); }
 .hero h1 {
-  font-size: clamp(2.2rem, 6vw, 3.75rem);
-  max-width: 18ch;
+  font-size: clamp(2.4rem, 6.5vw, 4.25rem);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
+  margin-bottom: 0.35em;
 }
 .lead {
-  font-size: 1.2rem;
-  max-width: 46ch;
-  color: var(--ink-soft);
+  font-size: clamp(1.1rem, 2vw, 1.3rem);
+  max-width: 38ch;
+  color: var(--ivory);
+  opacity: 0.92;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.5);
+  margin-top: 0;
 }
 .hero-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.85rem;
   flex-wrap: wrap;
-  margin-top: 1.75rem;
+  justify-content: center;
+  margin-top: 1.9rem;
+}
+.scroll-cue {
+  position: absolute;
+  bottom: 1.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--ivory);
+  opacity: 0.65;
+  font-size: 1.4rem;
+  text-decoration: none;
+  animation: cue-bob 2.4s ease-in-out infinite;
+}
+.scroll-cue:hover { opacity: 1; }
+@keyframes cue-bob {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 8px); }
 }
 
 .btn {
@@ -99,22 +143,35 @@ textarea:focus-visible {
   text-decoration: none;
   border: 2px solid var(--felt);
   border-radius: 6px;
-  padding: 0.7rem 1.4rem;
+  padding: 0.75rem 1.5rem;
   cursor: pointer;
 }
 .btn:hover { background: var(--felt-dark); border-color: var(--felt-dark); }
 .btn-ghost {
-  background: transparent;
-  color: var(--ebony);
-  border-color: var(--ebony);
+  background: rgba(27, 22, 19, 0.25);
+  color: var(--ivory);
+  border-color: var(--ivory);
 }
-.btn-ghost:hover { background: transparent; color: var(--felt); border-color: var(--felt); }
+.btn-ghost:hover { background: rgba(27, 22, 19, 0.45); color: var(--ivory); border-color: var(--ivory); }
+
+/* Parallax-stripe mellom seksjoner */
+.parallax-band {
+  height: 34vh;
+  min-height: 220px;
+  background-color: var(--ebony);
+  background-image:
+    linear-gradient(180deg, rgba(27, 22, 19, 0.5), rgba(27, 22, 19, 0.5)),
+    url('hero-piano.jpg');
+  background-size: cover;
+  background-position: center 72%;
+  background-attachment: fixed;
+}
 
 /* Seksjoner */
 .section {
   max-width: 64rem;
   margin: 0 auto;
-  padding: 4rem 1.5rem;
+  padding: 4.5rem 1.5rem;
 }
 .section-alt {
   max-width: none;
@@ -178,14 +235,6 @@ textarea:focus-visible {
   border-radius: 10px;
   border: 1.5px solid var(--ebony);
 }
-.about-text blockquote {
-  margin: 1.25rem 0 0;
-  padding-left: 1.25rem;
-  border-left: 4px solid var(--felt);
-  font-family: var(--font-display);
-  font-style: italic;
-  color: var(--ink-soft);
-}
 
 /* Skjema */
 .contact-form { max-width: 40rem; margin-top: 1.5rem; }
@@ -214,15 +263,16 @@ textarea:focus-visible {
 }
 .contact-form textarea { resize: vertical; }
 
-/* Footer */
+/* Footer — mørk scene igjen */
 .site-footer {
-  border-top: 1.5px solid var(--ebony);
-  padding: 2.5rem 1.5rem 3rem;
+  background: var(--ebony);
+  color: var(--ivory-soft);
+  padding: 3rem 1.5rem 3.5rem;
   text-align: center;
   font-size: 0.95rem;
-  color: var(--ink-soft);
 }
-.footer-mark { margin-bottom: 0.75rem; }
+.site-footer a { color: var(--felt-bright); }
+.footer-logo { height: 56px; width: auto; margin-bottom: 1rem; }
 
 /* Takk-siden */
 .thanks {
@@ -237,21 +287,21 @@ textarea:focus-visible {
 .thanks h1 { margin-top: 1.5rem; }
 .thanks p { max-width: 42ch; color: var(--ink-soft); }
 
-/* Mobil */
+/* Mobil — iOS støtter ikke fixed attachment; fall tilbake til statisk */
 @media (max-width: 44rem) {
+  .hero-stage, .parallax-band { background-attachment: scroll; }
+  .hero { min-height: 66vh; padding-top: 4vh; }
+  .parallax-band { height: 26vh; min-height: 160px; }
   .steps { grid-template-columns: 1fr; gap: 1.5rem; }
   .about { grid-template-columns: 1fr; gap: 1.5rem; }
   .about-photo { max-width: 24rem; }
   .form-grid { grid-template-columns: 1fr; }
-  .hero { padding-top: 2.5rem; padding-bottom: 3rem; }
   .section { padding: 2.75rem 1.5rem; }
-  .logo { height: 46px; }
+  .logo { height: 42px; }
 }
 
 html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
-  * { scroll-behavior: auto !important; transition: none !important; }
+  * { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+  .hero-stage, .parallax-band { background-attachment: scroll; }
 }
-
-/* Plassholder som venter på bekreftelse fra Stemmeren (fjernes i #6) */
-.tbd { border-bottom: 1px dashed var(--felt); }

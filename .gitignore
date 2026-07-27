@@ -5,3 +5,6 @@ dist/
 .DS_Store
 .scratch/
 .playwright-mcp/
+
+# Local Netlify folder
+.netlify
