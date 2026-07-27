@@ -155,6 +155,30 @@ textarea:focus-visible {
 }
 .btn-ghost:hover { background: rgba(27, 22, 19, 0.45); color: var(--ivory); border-color: var(--ivory); }
 
+.btn-outline {
+  background: transparent;
+  color: var(--ebony);
+  border-color: var(--ebony);
+}
+.btn-outline:hover { background: transparent; color: var(--felt); border-color: var(--felt); }
+.btn.is-playing { animation: spiller 2.4s ease-out; }
+@keyframes spiller {
+  0% { box-shadow: 0 0 0 0 rgba(198, 91, 65, 0.55); }
+  100% { box-shadow: 0 0 0 18px rgba(198, 91, 65, 0); }
+}
+
+/* Hør forskjellen-demo */
+.demo {
+  margin-top: 3rem;
+  border: 1.5px solid var(--ebony);
+  border-radius: 10px;
+  padding: 1.75rem 2rem;
+  background: var(--ivory-dark);
+}
+.demo h3 { font-size: 1.3rem; margin-top: 0; }
+.demo p { max-width: 58ch; color: var(--ink-soft); }
+.demo-knapper { display: flex; gap: 0.85rem; flex-wrap: wrap; margin-top: 1.1rem; }
+
 /* Parallax-stripe mellom seksjoner */
 .parallax-band {
   height: 34vh;
@@ -263,6 +287,58 @@ textarea:focus-visible {
   padding: 0.6rem 0.75rem;
 }
 .contact-form textarea { resize: vertical; }
+
+/* Spillbart klaviatur — mørk opptakt til footeren */
+.klaviatur-scene {
+  background: var(--ebony);
+  padding: 3.5rem 1.5rem 0.5rem;
+  text-align: center;
+}
+.klaviatur-tekst {
+  color: var(--ivory-soft);
+  font-family: var(--font-display);
+  font-style: italic;
+  margin: 0 0 1.5rem;
+}
+.klaviatur {
+  position: relative;
+  max-width: 34rem;
+  height: 150px;
+  margin: 0 auto;
+  display: flex;
+}
+.key {
+  padding: 0;
+  border-radius: 0 0 5px 5px;
+  cursor: pointer;
+}
+.key.white {
+  flex: 1 1 0;
+  background: var(--ivory);
+  border: 1px solid #0d0a08;
+  height: 100%;
+}
+.key.black {
+  position: absolute;
+  top: 0;
+  width: 7.5%;
+  height: 60%;
+  background: #0d0a08;
+  border: 1px solid rgba(245, 241, 232, 0.35);
+  z-index: 2;
+}
+.key.is-down { transform: translateY(2px); filter: brightness(0.92); }
+
+/* Scroll-reveal — kun når JS kjører; av ved redusert bevegelse */
+html.js .reveal {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+html.js .reveal.is-visible { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal { opacity: 1; transform: none; transition: none; }
+}
 
 /* Footer — mørk scene igjen */
 .site-footer {

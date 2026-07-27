@@ -15,6 +15,8 @@
   <link rel="icon" type="image/svg+xml" href="assets/logo-mark.svg">
   <link rel="stylesheet" href="assets/brand.css">
   <link rel="stylesheet" href="assets/style.css">
+  <script>document.documentElement.classList.add('js');</script>
+  <script src="assets/fx.js" defer></script>
 </head>
 <body>
 
@@ -49,7 +51,7 @@
 
   <main>
 
-    <section id="slik-foregar-det" class="section">
+    <section id="slik-foregar-det" class="section reveal">
       <p class="eyebrow">Slik foregår det</p>
       <h2>Fra sur til ren — i tre steg</h2>
       <ol class="steps">
@@ -69,10 +71,23 @@
           endelig låter slik det skal.</p>
         </li>
       </ol>
+
+      <div class="demo reveal">
+        <h3>Hør forskjellen selv</h3>
+        <p>
+          Samme akkord, to virkeligheter: sånn låter pianoet som har stått i
+          stua i ti år uten stemming — og sånn låter det når Geir har pakket
+          sammen verktøyet.
+        </p>
+        <div class="demo-knapper">
+          <button type="button" id="spill-ustemt" class="btn btn-outline">Ustemt piano</button>
+          <button type="button" id="spill-stemt" class="btn">Nystemt piano</button>
+        </div>
+      </div>
     </section>
 
     <section id="priser" class="section section-alt">
-      <div class="section-inner">
+      <div class="section-inner reveal">
       <p class="eyebrow">Pris</p>
       <h2>Én tjeneste, én pris</h2>
       <div class="price-card">
@@ -94,7 +109,7 @@
 
     <div class="parallax-band" role="presentation" aria-hidden="true"></div>
 
-    <section id="om" class="section">
+    <section id="om" class="section reveal">
       <div class="about">
         <img src="assets/geir-stemmer.jpg" alt="Geir Barlaup stemmer et åpent piano med stemmenøkkel" class="about-photo">
         <div class="about-text">
@@ -112,7 +127,7 @@
     </section>
 
     <section id="kontakt" class="section section-alt">
-      <div class="section-inner">
+      <div class="section-inner reveal">
       <p class="eyebrow">Kontakt</p>
       <h2>Send en henvendelse</h2>
       <p class="section-intro">
@@ -153,6 +168,26 @@
           <button type="submit" class="btn">Send henvendelsen</button>
         </p>
       </form>
+      </div>
+    </section>
+    <section class="klaviatur-scene" aria-label="Spillbart klaviatur">
+      <div class="reveal">
+        <p class="klaviatur-tekst">PS: Disse tangentene er alltid nystemt — prøv selv.</p>
+        <div class="klaviatur">
+          <button type="button" class="key white" data-midi="60" aria-label="Spill tonen C"></button>
+          <button type="button" class="key white" data-midi="62" aria-label="Spill tonen D"></button>
+          <button type="button" class="key white" data-midi="64" aria-label="Spill tonen E"></button>
+          <button type="button" class="key white" data-midi="65" aria-label="Spill tonen F"></button>
+          <button type="button" class="key white" data-midi="67" aria-label="Spill tonen G"></button>
+          <button type="button" class="key white" data-midi="69" aria-label="Spill tonen A"></button>
+          <button type="button" class="key white" data-midi="71" aria-label="Spill tonen H"></button>
+          <button type="button" class="key white" data-midi="72" aria-label="Spill tonen høy C"></button>
+          <button type="button" class="key black" data-midi="61" style="left: 8.75%" aria-label="Spill tonen Ciss"></button>
+          <button type="button" class="key black" data-midi="63" style="left: 21.25%" aria-label="Spill tonen Diss"></button>
+          <button type="button" class="key black" data-midi="66" style="left: 46.25%" aria-label="Spill tonen Fiss"></button>
+          <button type="button" class="key black" data-midi="68" style="left: 58.75%" aria-label="Spill tonen Giss"></button>
+          <button type="button" class="key black" data-midi="70" style="left: 71.25%" aria-label="Spill tonen Aiss"></button>
+        </div>
       </div>
     </section>
   </main>
