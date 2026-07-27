@@ -94,8 +94,61 @@
     });
   });
 
-  /* ---------- Scroll-reveal ---------- */
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Støv i scenelyset ---------- */
+  var canvas = document.querySelector('.stov');
+  if (canvas && !reduced) {
+    var c2d = canvas.getContext('2d');
+    var stage = canvas.parentElement;
+    var W = 0, H = 0;
+    var parts = [];
+    function newPart(fraBunn) {
+      return {
+        x: Math.random() * W,
+        y: fraBunn ? H + 4 : Math.random() * H,
+        r: 0.6 + Math.random() * 1.6,
+        vx: -(0.04 + Math.random() * 0.14),
+        vy: -(0.07 + Math.random() * 0.2),
+        a: 0.06 + Math.random() * 0.26,
+        ph: Math.random() * Math.PI * 2
+      };
+    }
+    function size() {
+      W = canvas.width = stage.clientWidth;
+      H = canvas.height = stage.clientHeight;
+      var n = Math.max(12, Math.min(42, Math.floor(W / 36)));
+      while (parts.length < n) parts.push(newPart(false));
+      parts.length = n;
+    }
+    size();
+    window.addEventListener('resize', size);
+    var iSyne = true;
+    new IntersectionObserver(function (entries) {
+      iSyne = entries[0].isIntersecting;
+    }).observe(stage);
+    (function tick(t) {
+      if (iSyne) {
+        c2d.clearRect(0, 0, W, H);
+        parts.forEach(function (p) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.y < -4 || p.x < -4) {
+            var ny = newPart(true);
+            for (var k in ny) p[k] = ny[k];
+          }
+          var glimt = p.a * (0.55 + 0.45 * Math.sin(t / 900 + p.ph));
+          c2d.beginPath();
+          c2d.arc(p.x, p.y, p.r, 0, 7);
+          c2d.fillStyle = 'rgba(233, 196, 150, ' + glimt.toFixed(3) + ')';
+          c2d.fill();
+        });
+      }
+      requestAnimationFrame(tick);
+    })(0);
+  }
+
+  /* ---------- Scroll-reveal ---------- */
   var revealed = document.querySelectorAll('.reveal');
   if (!reduced && 'IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {

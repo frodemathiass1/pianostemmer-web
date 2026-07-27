@@ -38,6 +38,7 @@ textarea:focus-visible {
 /* Mørk scene: header + hero deler bakgrunnsfoto */
 .hero-stage {
   position: relative;
+  overflow: hidden;
   background-color: var(--ebony);
   background-image:
     linear-gradient(180deg, rgba(27, 22, 19, 0.72) 0%, rgba(27, 22, 19, 0.35) 45%, rgba(27, 22, 19, 0.82) 100%),
@@ -47,6 +48,32 @@ textarea:focus-visible {
   background-attachment: fixed;
   color: var(--ivory);
 }
+
+/* Pustende scenelys — to varme lyskjegler i rust og messing */
+.hero-stage::before {
+  content: '';
+  position: absolute;
+  inset: -22%;
+  pointer-events: none;
+  background:
+    radial-gradient(36% 44% at 68% 28%, rgba(217, 140, 74, 0.30), transparent 70%),
+    radial-gradient(30% 42% at 24% 66%, rgba(166, 61, 42, 0.22), transparent 70%);
+  animation: scenelys 24s ease-in-out infinite alternate;
+}
+@keyframes scenelys {
+  0% { transform: translate3d(-2.5%, -2%, 0) scale(1); opacity: 0.7; }
+  100% { transform: translate3d(2.5%, 2%, 0) scale(1.08); opacity: 1; }
+}
+
+/* Støv i lysstrålen */
+.stov {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+.site-header, .hero { position: relative; z-index: 1; }
 
 /* Header */
 .site-header {
@@ -98,8 +125,13 @@ textarea:focus-visible {
 .hero .eyebrow { color: var(--felt-bright); }
 .hero h1 {
   font-size: clamp(2.4rem, 6.5vw, 4.25rem);
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.45);
   margin-bottom: 0.35em;
+  /* Varmt lysstreif av messing/rust i kanten av bokstavene */
+  color: var(--ivory);
+  background: linear-gradient(105deg, var(--ivory) 52%, #dfa86a 82%, #b06a33 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .lead {
   font-size: clamp(1.05rem, 1.7vw, 1.2rem);
@@ -184,8 +216,9 @@ textarea:focus-visible {
   height: 34vh;
   min-height: 220px;
   background-color: var(--ebony);
+  /* Kobberrust-duotone over tangentene */
   background-image:
-    linear-gradient(180deg, rgba(27, 22, 19, 0.5), rgba(27, 22, 19, 0.5)),
+    linear-gradient(180deg, rgba(27, 22, 19, 0.55), rgba(122, 58, 27, 0.38)),
     url('hero-piano.jpg');
   background-size: cover;
   background-position: center 72%;
@@ -381,4 +414,5 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
   .hero-stage, .parallax-band { background-attachment: scroll; }
+  .stov { display: none; }
 }
