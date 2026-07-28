@@ -3,41 +3,146 @@
 (function () {
   'use strict';
 
-  /* ---------- Lyd: enkel piano-aktig synth ---------- */
-  var ctx = null;
-  function audio() {
-    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') ctx.resume();
+  function tilListe(nodeList) { return Array.prototype.slice.call(nodeList); }
+
+  /* ---------- Lyd: enkel piano-aktig synth ----------
+     iOS er kresen på to måter, og begge er håndtert her:
+     1) Web Audio havner i «ambient»-kategorien og blir stum av
+        ringebryteren på siden av telefonen. audioSession-kategorien
+        «playback» overstyrer det (Safari 16.4+); eldre iOS trenger at
+        et HTMLAudioElement har spilt av minst én gang.
+     2) WebKit godtar i praksis bare click/touchend/keydown som gesten
+        som låser opp lyd — pointerdown teller ikke. Derfor låses lyden
+        opp av en egen lytter, og toner som ble bedt om før den tid
+        settes i kø og spilles så snart konteksten faktisk går. */
+  var ctx = null;      /* AudioContext */
+  var buss = null;     /* felles utgang: gain → kompressor → høyttaler */
+  var ko = [];         /* toner som venter på at konteksten våkner */
+  var sesjonSatt = false;
+  var STILLE_WAV = 'data:audio/wav;base64,UklGRuwAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YcgAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+
+  function lagKontekst() {
+    if (ctx) return ctx;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    ctx = new AC();
+    /* Alt går gjennom én kompressor, slik at en full akkord (åtte
+       strenger med overtoner) ikke klipper når vi skrur opp nivået. */
+    buss = ctx.createGain();
+    buss.gain.value = 0.9;
+    var komp = ctx.createDynamicsCompressor();
+    komp.threshold.value = -14;
+    komp.knee.value = 24;
+    komp.ratio.value = 8;
+    komp.attack.value = 0.004;
+    komp.release.value = 0.2;
+    buss.connect(komp);
+    komp.connect(ctx.destination);
+    /* iOS setter «interrupted» etter Siri, en telefon eller skjermlås. */
+    ctx.onstatechange = function () {
+      if (ctx.state === 'running') tomKo();
+    };
     return ctx;
   }
 
+  function settSesjon() {
+    if (sesjonSatt) return;
+    sesjonSatt = true;
+    try {
+      if (navigator.audioSession) {
+        navigator.audioSession.type = 'playback';
+        return;
+      }
+    } catch (e) { /* ikke støttet — fall gjennom */ }
+    /* Eldre iOS: å spille av et mediaelement bytter lydkategori. */
+    try {
+      var el = new Audio(STILLE_WAV);
+      el.setAttribute('playsinline', '');
+      el.volume = 0.001;
+      el.loop = true;
+      var p = el.play();
+      if (p && p.catch) p.catch(function () {});
+      setTimeout(function () { el.pause(); }, 800);
+    } catch (e2) { /* ikke kritisk */ }
+  }
+
+  /* Låser opp en kontekst som allerede finnes. Vi lager den ikke her —
+     da ville et hvilket som helst klikk på siden ha startet en lydsesjon
+     og stoppet musikken folk hører på. */
+  function lasOpp() {
+    if (!ctx) return;
+    if (ctx.state === 'running') { tomKo(); return; }
+    var p = ctx.resume();
+    if (p && p.then) p.then(tomKo, function () {}); else tomKo();
+  }
+
+  function tomKo() {
+    if (!ctx || ctx.state !== 'running') return;
+    var na = new Date().getTime();
+    var venter = ko;
+    ko = [];
+    venter.forEach(function (post) {
+      /* Ikke fyr av gamle anslag hvis opplåsingen tok lang tid. */
+      if (na - post.tid < 1500) post.fn();
+    });
+  }
+
+  /* Kjør fn nå hvis lyden går — ellers sett den i kø og prøv å låse opp. */
+  function medLyd(fn) {
+    var ac = lagKontekst();
+    if (!ac) return;
+    settSesjon();
+    if (ac.state === 'running') { fn(); return; }
+    ko.push({ fn: fn, tid: new Date().getTime() });
+    lasOpp();
+  }
+
+  /* WebKit låser opp lyd på disse — ikke på pointerdown/touchstart. */
+  ['touchend', 'click', 'keydown'].forEach(function (navn) {
+    document.addEventListener(navn, lasOpp, true);
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden && ctx && ctx.state !== 'running') lasOpp();
+  });
+
   /* Én tone = grunnfrekvens + overtoner, med anslag og utklinging.
-     detune (i cent) er avviket fra ren stemming — det er «suret». */
+     detune (i cent) er avviket fra ren stemming — det er «suret».
+     Overtonene er kraftige med vilje: mobilhøyttalere gjengir nesten
+     ingenting under ~500 Hz, så en ren sinus på C4 blir uhørbar. Det er
+     overtonene som bærer tonehøyden på en liten høyttaler. */
+  var OVERTONER = [[1, 1], [2, 0.55], [3, 0.32], [4, 0.2], [5, 0.12], [6, 0.07]];
+
   function playNote(freq, opts) {
     opts = opts || {};
-    var ac = audio();
-    var t = ac.currentTime + (opts.delay || 0);
-    var dur = opts.dur || 2.4;
-    var master = ac.createGain();
-    master.gain.setValueAtTime(0, t);
-    master.gain.linearRampToValueAtTime(opts.gain || 0.16, t + 0.012);
-    master.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    var lp = ac.createBiquadFilter();
-    lp.type = 'lowpass';
-    lp.frequency.value = 2800;
-    master.connect(lp);
-    lp.connect(ac.destination);
-    [[1, 1], [2, 0.32], [3, 0.11], [4, 0.05]].forEach(function (partial) {
-      var o = ac.createOscillator();
-      o.type = 'sine';
-      o.frequency.value = freq * partial[0];
-      o.detune.value = opts.detune || 0;
-      var g = ac.createGain();
-      g.gain.value = partial[1];
-      o.connect(g);
-      g.connect(master);
-      o.start(t);
-      o.stop(t + dur + 0.1);
+    medLyd(function () {
+      var ac = ctx;
+      var t = ac.currentTime + (opts.delay || 0);
+      var dur = opts.dur || 2.4;
+      var master = ac.createGain();
+      master.gain.setValueAtTime(0, t);
+      master.gain.linearRampToValueAtTime(opts.gain || 0.3, t + 0.012);
+      master.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      var lp = ac.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 5200;
+      master.connect(lp);
+      lp.connect(buss);
+      OVERTONER.forEach(function (partial, i) {
+        var o = ac.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = freq * partial[0];
+        o.detune.value = opts.detune || 0;
+        var g = ac.createGain();
+        /* Høye overtoner dør fortest — som på et ekte piano. */
+        g.gain.setValueAtTime(partial[1], t);
+        g.gain.exponentialRampToValueAtTime(
+          partial[1] * 0.02, t + dur / (1 + i * 0.5)
+        );
+        o.connect(g);
+        g.connect(master);
+        o.start(t);
+        o.stop(t + dur + 0.1);
+      });
     });
   }
 
@@ -45,8 +150,8 @@
      hverandre. Ustemt: strengeparene spriker (svev) OG tonene har drevet
      skjevt i forhold til hverandre (center-avvik i cent). */
   function playString(freq, center, spread, delay) {
-    playNote(freq, { detune: center - spread / 2, delay: delay, gain: 0.11 });
-    playNote(freq, { detune: center + spread / 2, delay: delay, gain: 0.11 });
+    playNote(freq, { detune: center - spread / 2, delay: delay, gain: 0.2 });
+    playNote(freq, { detune: center + spread / 2, delay: delay, gain: 0.2 });
   }
 
   var CHORD = [261.63, 329.63, 392.0, 523.25]; /* C-dur: C4 E4 G4 C5 */
@@ -80,15 +185,24 @@
   });
 
   /* ---------- Spillbare tangenter ---------- */
-  var keys = document.querySelectorAll('.klaviatur .key');
+  var keys = tilListe(document.querySelectorAll('.klaviatur .key'));
   function midiToFreq(m) { return 440 * Math.pow(2, (m - 69) / 12); }
   keys.forEach(function (key) {
+    var sisteAnslag = 0;
     var press = function () {
-      playNote(midiToFreq(parseInt(key.dataset.midi, 10)), { dur: 1.8, gain: 0.2 });
+      /* pointerdown gir raskest respons, men på iOS er det ikke en gyldig
+         gest for lyd — der bærer touchend/click anslaget i stedet. Vakten
+         hindrer at begge to fyrer av samme tone. */
+      var na = new Date().getTime();
+      if (na - sisteAnslag < 300) return;
+      sisteAnslag = na;
+      playNote(midiToFreq(parseInt(key.getAttribute('data-midi'), 10)),
+        { dur: 1.8, gain: 0.42 });
       key.classList.add('is-down');
       setTimeout(function () { key.classList.remove('is-down'); }, 180);
     };
     key.addEventListener('pointerdown', press);
+    key.addEventListener('click', press);
     key.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); press(); }
     });
@@ -187,7 +301,7 @@
   }
 
   /* ---------- Scroll-reveal ---------- */
-  var revealed = document.querySelectorAll('.reveal');
+  var revealed = tilListe(document.querySelectorAll('.reveal'));
   if (!reduced && 'IntersectionObserver' in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
