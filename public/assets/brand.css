@@ -8,6 +8,7 @@
   --ebony: #1b1613; /* mørk scene — dyp varm nesten-sort */
   --felt: #a63d2a; /* aksent — stemmefilt-rød; knapper og lenker på lyst */
   --felt-bright: #c65b41; /* aksent på mørk bakgrunn (kontrast) */
+  --felt-lys: #d2704f; /* lenketekst på mørk bakgrunn — består WCAG AA (5.3:1) */
   --felt-dark: #872f1f; /* hover/aktiv på aksentelementer */
   --ink-soft: #6d6558; /* dempet tekst på lys bakgrunn */
   --ivory-soft: #b3a899; /* dempet tekst på mørk bakgrunn */

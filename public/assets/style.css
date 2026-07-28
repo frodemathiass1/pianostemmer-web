@@ -395,7 +395,7 @@ html.js .reveal.is-visible { opacity: 1; transform: none; }
   text-align: center;
   font-size: 0.95rem;
 }
-.site-footer a { color: var(--felt-bright); }
+.site-footer a { color: var(--felt-lys); }
 .footer-logo { height: 56px; width: auto; margin-bottom: 1rem; }
 
 /* 404 — mørk scene */
