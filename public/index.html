@@ -49,14 +49,17 @@
   <div class="streng" aria-hidden="true"></div>
 
   <!-- Hero-foto: Geert Pieters via Unsplash (Unsplash License, fri kommersiell bruk) -->
-  <div class="hero-stage">
+  <div class="hero-stage" id="topp">
     <canvas class="stov" aria-hidden="true"></canvas>
     <header class="site-header">
       <img src="assets/logo-lys.svg" alt="Pianostemmer'n — rene toner" class="logo">
       <nav aria-label="Hovedmeny">
-        <a href="#slik-foregar-det">Slik foregår det</a>
-        <a href="#priser">Pris</a>
-        <a href="#om">Om stemmeren</a>
+        <div class="nav-lenker">
+          <a href="#slik-foregar-det">Slik foregår det</a>
+          <a href="#priser">Pris</a>
+          <a href="#om">Om stemmeren</a>
+          <a href="#bilder">Bilder</a>
+        </div>
         <a href="#kontakt" class="nav-cta">Kontakt</a>
       </nav>
     </header>
@@ -156,6 +159,63 @@
       </div>
     </section>
 
+    <section id="bilder" class="section galleri-scene">
+      <div class="section-inner reveal">
+      <p class="eyebrow">Bilder</p>
+      <h2>Pianoer Geir har hatt hendene i</h2>
+      <p class="section-intro">
+        Flygel i konsertsal, oppreist piano i stua, kirkepiano med fronten av —
+        hvert instrument har sitt eget lynne. Her er noen av dem.
+      </p>
+
+      <div class="galleri">
+        <figure class="galleri-kort">
+          <a class="galleri-lenke" href="assets/piano1-1200.jpg">
+            <img src="assets/piano1-600.jpg"
+                 srcset="assets/piano1-600.jpg 600w, assets/piano1-1200.jpg 1200w"
+                 sizes="(max-width: 44rem) 72vw, (max-width: 62rem) 44vw, 15rem"
+                 width="600" height="800" loading="lazy" decoding="async"
+                 alt="Åpent Blüthner-flygel med et verktøy liggende på strengene, i en sal med rader av trestoler bak">
+          </a>
+          <figcaption>Blüthner-flygel, lokket oppe.</figcaption>
+        </figure>
+
+        <figure class="galleri-kort">
+          <a class="galleri-lenke" href="assets/piano2-1200.jpg">
+            <img src="assets/piano2-600.jpg"
+                 srcset="assets/piano2-600.jpg 600w, assets/piano2-1200.jpg 1200w"
+                 sizes="(max-width: 44rem) 72vw, (max-width: 62rem) 44vw, 15rem"
+                 width="600" height="800" loading="lazy" decoding="async"
+                 alt="Mørkt brunt oppreist piano med frontplaten tatt av og satt til side, så hammere og dempere ligger åpent">
+          </a>
+          <figcaption>Fronten av — mekanikken ligger åpen.</figcaption>
+        </figure>
+
+        <figure class="galleri-kort">
+          <a class="galleri-lenke" href="assets/piano3-1200.jpg">
+            <img src="assets/piano3-600.jpg"
+                 srcset="assets/piano3-600.jpg 600w, assets/piano3-1200.jpg 1200w"
+                 sizes="(max-width: 44rem) 72vw, (max-width: 62rem) 44vw, 15rem"
+                 width="600" height="800" loading="lazy" decoding="async"
+                 alt="Nærbilde inn i et Blüthner-piano med panelene av — hammere, dempere og strenger synlige, med et verktøy liggende på tangentene">
+          </a>
+          <figcaption>Tett på hammere og dempere.</figcaption>
+        </figure>
+
+        <figure class="galleri-kort">
+          <a class="galleri-lenke" href="assets/piano4-1200.jpg">
+            <img src="assets/piano4-600.jpg"
+                 srcset="assets/piano4-600.jpg 600w, assets/piano4-1200.jpg 1200w"
+                 sizes="(max-width: 44rem) 72vw, (max-width: 62rem) 44vw, 15rem"
+                 width="600" height="800" loading="lazy" decoding="async"
+                 alt="Oppreist piano med front- og toppanel tatt av, i en rikt dekorert trekirke, med pianokrakk foran">
+          </a>
+          <figcaption>Kirkepiano, klart for stemming.</figcaption>
+        </figure>
+      </div>
+      </div>
+    </section>
+
     <section id="kontakt" class="section section-alt">
       <div class="section-inner reveal">
       <p class="eyebrow">Kontakt</p>
@@ -231,6 +291,21 @@
       <a href="mailto:geir_barlaup@hotmail.com">geir_barlaup@hotmail.com</a>
     </p>
   </footer>
+
+  <a class="til-topp" href="#topp" aria-label="Til toppen av siden">&uarr;</a>
+
+  <dialog class="lightboks" aria-label="Bildevisning">
+    <button type="button" class="lightboks-lukk" aria-label="Lukk bildevisning">&times;</button>
+    <button type="button" class="lightboks-pil lightboks-forrige" aria-label="Forrige bilde">&#8249;</button>
+    <button type="button" class="lightboks-pil lightboks-neste" aria-label="Neste bilde">&#8250;</button>
+    <figure class="lightboks-figur">
+      <img alt="">
+      <figcaption>
+        <span class="lightboks-tekst"></span>
+        <span class="lightboks-teller"></span>
+      </figcaption>
+    </figure>
+  </dialog>
 
 </body>
 </html>
