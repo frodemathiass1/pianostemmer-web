@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototype: flygel i 3D — Pianostemmer'n</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="../public/assets/logo-mark.svg">
+  <link rel="stylesheet" href="../public/assets/brand.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--ebony);
+      color: var(--ivory);
+      font-family: var(--font-body);
+      overflow: hidden;
+    }
+    /* Lerretet fyller vinduet; alt annet ligger oppå */
+    canvas { display: block; }
+
+    .paneler {
+      position: fixed;
+      inset: 0;
+      pointer-events: none; /* klikk går til lerretet, unntatt der vi slår det på */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.25rem;
+    }
+    .topp { max-width: 30rem; }
+    .eyebrow {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--felt-bright);
+      margin: 0 0 0.4rem;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 4vw, 2rem);
+      line-height: 1.15;
+      margin: 0 0 0.4rem;
+    }
+    .hint {
+      color: var(--ivory-soft);
+      font-size: 0.88rem;
+      margin: 0;
+    }
+
+    .knapper {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      pointer-events: auto;
+    }
+    button {
+      font: inherit;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--ivory);
+      background: rgba(245, 241, 232, 0.08);
+      border: 1.5px solid rgba(245, 241, 232, 0.3);
+      border-radius: 6px;
+      padding: 0.6rem 1.1rem;
+      cursor: pointer;
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+    }
+    button:hover { border-color: var(--felt-bright); }
+    button[aria-pressed="true"] {
+      background: var(--felt);
+      border-color: var(--felt);
+    }
+    button:focus-visible {
+      outline: 3px solid var(--felt-bright);
+      outline-offset: 2px;
+    }
+
+    /* Stemmeviser */
+    .bunn { display: flex; flex-direction: column; align-items: flex-start; }
+    .stemmer {
+      pointer-events: none;
+      width: min(22rem, 100%);
+      margin-bottom: 0.9rem;
+      padding: 0.85rem 1.1rem 0.9rem;
+      border-radius: 10px;
+      background: rgba(13, 10, 8, 0.72);
+      border: 1.5px solid rgba(245, 241, 232, 0.22);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+    .stemmer-topp {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1rem;
+    }
+    .stemmer-tone {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+    .stemmer-tall {
+      font-variant-numeric: tabular-nums;
+      font-size: 0.9rem;
+      color: var(--ivory-soft);
+    }
+    .stemmer-skala {
+      position: relative;
+      height: 6px;
+      margin: 0.7rem 0 0.55rem;
+      border-radius: 3px;
+      background: linear-gradient(90deg,
+        rgba(166, 61, 42, 0.55), rgba(245, 241, 232, 0.25), rgba(166, 61, 42, 0.55));
+    }
+    .stemmer-midt {
+      position: absolute;
+      left: 50%;
+      top: -3px;
+      width: 2px;
+      height: 12px;
+      margin-left: -1px;
+      background: rgba(245, 241, 232, 0.55);
+    }
+    .stemmer-nal {
+      position: absolute;
+      top: -5px;
+      width: 4px;
+      height: 16px;
+      margin-left: -2px;
+      border-radius: 2px;
+      background: var(--felt-bright);
+      transition: background 0.2s ease;
+    }
+    .stemmer-status {
+      margin: 0;
+      font-size: 0.85rem;
+      color: var(--ivory-soft);
+    }
+    /* Når strengen er ren, skal det synes med én gang */
+    .stemmer.er-rent { border-color: #6fae7a; }
+    .stemmer.er-rent .stemmer-nal { background: #6fae7a; }
+    .stemmer.er-rent .stemmer-status { color: #9ed3a6; }
+
+    .laster {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: var(--ivory-soft);
+      font-family: var(--font-display);
+      font-style: italic;
+    }
+    @media (max-width: 30rem) {
+      button { padding: 0.55rem 0.8rem; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+  <p class="laster" id="laster">Setter opp scenen …</p>
+
+  <div class="paneler">
+    <div class="topp">
+      <p class="eyebrow">Prototype</p>
+      <h1>Under panseret</h1>
+      <p class="hint">Ta tak i en <strong>streng</strong> og dra opp eller ned for å
+      stemme den — hør svevet bli langsommere jo nærmere du kommer.<br>
+      Dra ellers for å snurre · rull for å zoome</p>
+    </div>
+
+    <div class="bunn">
+    <div class="stemmer" id="hud" hidden>
+      <div class="stemmer-topp">
+        <span class="stemmer-tone" id="hud-tone">A4</span>
+        <span class="stemmer-tall" id="hud-tall">0 cent</span>
+      </div>
+      <div class="stemmer-skala">
+        <span class="stemmer-midt"></span>
+        <span class="stemmer-nal" id="hud-nal"></span>
+      </div>
+      <p class="stemmer-status" id="hud-status">For lav</p>
+    </div>
+
+    <div class="knapper">
+      <button type="button" id="lokk" aria-pressed="true">Lukk lokket</button>
+      <button type="button" id="innsyn" aria-pressed="false">Se gjennom kassa</button>
+      <button type="button" id="slipp">Slipp naglen</button>
+      <button type="button" id="nullstill">Nullstill</button>
+    </div>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    import { Reflector } from 'three/addons/objects/Reflector.js';
+
+    const rolig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- Scene, kamera, lys ---------- */
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1b1613);
+
+    const kamera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 100);
+
+    /* Fov-en er vertikal, så et smalt vindu ser mindre på tvers enn på
+       høyden. Avstanden regnes ut fra den trangeste av de to synsvinklene,
+       så innrammingen glir jevnt fra bredskjerm til mobil. (En hard
+       terskel på aspect < 1 gjorde flygelet frimerkestort i et vindu som
+       bare var litt høyere enn bredt.) */
+    const RETNING = new THREE.Vector3(2.15, 1.15, 2.55).normalize();
+    const RADIUS = 1.5; /* omtrentlig kule rundt instrumentet, med luft */
+
+    function rammeInn() {
+      const vHalv = THREE.MathUtils.degToRad(kamera.fov) / 2;
+      const hHalv = Math.atan(Math.tan(vHalv) * kamera.aspect);
+      const trangest = Math.min(vHalv, hHalv);
+      kamera.position.copy(RETNING).multiplyScalar(RADIUS / Math.sin(trangest));
+      kontroller.target.set(0, 0.12, 0);
+      kontroller.update();
+    }
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(innerWidth, innerHeight);
+    /* Kappet på 2: over det koster det mye og synes lite */
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    document.body.appendChild(renderer.domElement);
+
+    /* Lakk og messing trenger noe å speile seg i. RoomEnvironment lager et
+       brukbart miljø i kode, så vi slipper å laste en HDRI-fil. */
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    /* Hovedlys, nesten nøytralt. De fargede lampene under er akkurat det —
+       aksenter. Da de bar hele lyssettingen alene, ble elfenbenstangentene
+       messinggule. */
+    const hoved = new THREE.DirectionalLight(0xfff6ec, 2.4);
+    hoved.position.set(2.8, 4.2, 3.4);
+    scene.add(hoved);
+
+    /* Samme to varme lyskjegler som heroen på forsiden: rust og messing */
+    const rust = new THREE.PointLight(0xa63d2a, 11, 14, 2);
+    rust.position.set(-2.2, 2.4, 1.6);
+    scene.add(rust);
+
+    const messing = new THREE.PointLight(0xd98c4a, 13, 16, 2);
+    messing.position.set(2.6, 3.2, -1.4);
+    scene.add(messing);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+
+    const kontroller = new OrbitControls(kamera, renderer.domElement);
+    kontroller.enableDamping = true;
+    kontroller.dampingFactor = 0.07;
+    kontroller.minDistance = 1.6;
+    kontroller.maxDistance = 11;
+    /* Ikke la folk havne under gulvet — der er det ingenting å se */
+    kontroller.maxPolarAngle = Math.PI * 0.49;
+    rammeInn();
+
+    /* Doven rotasjon som gir seg så snart noen tar tak, og tar seg opp
+       igjen når de har sluppet en stund. */
+    kontroller.autoRotate = !rolig;
+    kontroller.autoRotateSpeed = 0.55;
+    let ventePåRo;
+    kontroller.addEventListener('start', () => {
+      kontroller.autoRotate = false;
+      clearTimeout(ventePåRo);
+    });
+    kontroller.addEventListener('end', () => {
+      clearTimeout(ventePåRo);
+      if (!rolig) ventePåRo = setTimeout(() => {
+        /* Holder noen på med en nagle, får flygelet stå i ro */
+        if (!valgt) kontroller.autoRotate = true;
+      }, 6000);
+    });
+
+    /* Speilgulv. Reflector rendrer scenen en gang til, så oppløsningen
+       holdes lav — det er en antydning av gulv vi er ute etter, ikke et
+       speil man skal lese detaljer i. */
+    const GULV = -0.73;
+    const gulv = new Reflector(new THREE.CircleGeometry(5.5, 64), {
+      textureWidth: 512,
+      textureHeight: 512,
+      /* color er en multiplikator på refleksjonen — for mørk her, og
+         speilet forsvinner helt */
+      color: 0x6e675e
+    });
+    gulv.rotateX(-Math.PI / 2);
+    gulv.position.y = GULV;
+    scene.add(gulv);
+
+    /* Refleksjonen kuttes brått i kanten av sirkelen. Et lag med samme
+       farge som bakgrunnen, gjennomsiktig i midten, visker overgangen ut. */
+    const utto = document.createElement('canvas');
+    utto.width = utto.height = 256;
+    const g2d = utto.getContext('2d');
+    const grad = g2d.createRadialGradient(128, 128, 20, 128, 128, 128);
+    grad.addColorStop(0, 'rgba(27, 22, 19, 0)');
+    grad.addColorStop(0.34, 'rgba(27, 22, 19, 0.42)');
+    grad.addColorStop(0.62, 'rgba(27, 22, 19, 0.92)');
+    grad.addColorStop(1, 'rgba(27, 22, 19, 1)');
+    g2d.fillStyle = grad;
+    g2d.fillRect(0, 0, 256, 256);
+
+    const slør = new THREE.Mesh(
+      new THREE.CircleGeometry(5.7, 64),
+      new THREE.MeshBasicMaterial({
+        map: new THREE.CanvasTexture(utto), transparent: true, depthWrite: false
+      })
+    );
+    slør.rotateX(-Math.PI / 2);
+    slør.position.y = GULV + 0.004;
+    scene.add(slør);
+
+    /* ---------- Materialer ---------- */
+    const lakk = new THREE.MeshPhysicalMaterial({
+      color: 0x0d0a08, roughness: 0.18, metalness: 0.0,
+      clearcoat: 1, clearcoatRoughness: 0.06
+    });
+    const ramme = new THREE.MeshStandardMaterial({
+      color: 0xb98b3e, roughness: 0.42, metalness: 0.85
+    });
+    const stål = new THREE.MeshStandardMaterial({
+      color: 0xbfae94, roughness: 0.3, metalness: 1
+    });
+    const elfenben = new THREE.MeshStandardMaterial({
+      color: 0xf5f1e8, roughness: 0.55, metalness: 0
+    });
+    const ibenholt = new THREE.MeshStandardMaterial({
+      color: 0x0d0a08, roughness: 0.4, metalness: 0
+    });
+    const filt = new THREE.MeshStandardMaterial({
+      color: 0x7d2a1b, roughness: 0.95, metalness: 0
+    });
+
+    /* ---------- Flygelets omriss ----------
+       Rett kant på bass-siden (x = 0), bue på diskantsiden. `k` krymper
+       omrisset innover, så samme kurve kan gi både ytterkant og hulrom. */
+    const BREDDE = 1.48, LENGDE = 2.15, KASSE = 0.24;
+    const VEGG = 0.055;
+
+    function tegnOmriss(mål, k, framkant) {
+      const y0 = framkant === undefined ? k : framkant;
+      mål.moveTo(k, y0);
+      mål.lineTo(BREDDE - k, y0);
+      mål.lineTo(BREDDE - k, 0.5);
+      mål.bezierCurveTo(
+        BREDDE - k, 1.55,
+        BREDDE - 0.34 - k * 0.5, LENGDE - k,
+        0.6, LENGDE - k
+      );
+      mål.lineTo(k, LENGDE - k);
+      mål.lineTo(k, y0);
+    }
+
+    /* Legger geometrien ned i XZ-planet: shape-Y blir dybde, ekstruderingen
+       blir høyde. */
+    function liggende(shape, dybde, fas) {
+      const g = new THREE.ExtrudeGeometry(shape, {
+        depth: dybde, bevelEnabled: !!fas,
+        bevelThickness: 0.008, bevelSize: 0.008, bevelSegments: 2,
+        curveSegments: 26
+      });
+      g.rotateX(-Math.PI / 2);
+      return g;
+    }
+
+    const flygel = new THREE.Group();
+    scene.add(flygel);
+
+    /* Kassa er hul — bare vegger. En massiv ekstrudering ville gjemt hele
+       mekanikken inne i seg, og da er det ikke mye å åpne lokket for. */
+    const kasseShape = new THREE.Shape();
+    tegnOmriss(kasseShape, 0);
+    const hulrom = new THREE.Path();
+    tegnOmriss(hulrom, VEGG);
+    kasseShape.holes.push(hulrom);
+
+    const kasse = new THREE.Mesh(liggende(kasseShape, KASSE, true), lakk);
+    flygel.add(kasse);
+
+    /* Bunnen under hulrommet */
+    const bunnShape = new THREE.Shape();
+    tegnOmriss(bunnShape, VEGG * 0.6);
+    const bunn = new THREE.Mesh(liggende(bunnShape, 0.02, false), lakk);
+    bunn.position.y = 0.01;
+    flygel.add(bunn);
+
+    /* Støpejernsrammen som strengene er spent over */
+    const platShape = new THREE.Shape();
+    /* Stopper bak klaviaturet — ellers lyser gullet opp mellom tangentene */
+    tegnOmriss(platShape, VEGG + 0.02, 0.3);
+    const plate = new THREE.Mesh(liggende(platShape, 0.014, false), ramme);
+    plate.position.y = 0.035;
+    flygel.add(plate);
+
+    /* Mørk bunn under tangentene, så det ikke gaper tomt der framme */
+    const tangentbunn = new THREE.Mesh(
+      new THREE.BoxGeometry(BREDDE - VEGG * 2, 0.02, 0.24), ibenholt
+    );
+    tangentbunn.position.set(BREDDE / 2, KASSE - 0.05, -0.14);
+    flygel.add(tangentbunn);
+
+    /* Strengene: lange i bassen, korte i diskanten */
+    const strenger = new THREE.Group();
+    const strengGeo = new THREE.BoxGeometry(1, 1, 1);
+    for (let i = 0; i < 58; i++) {
+      const t = i / 57;
+      const lengde = 1.72 - t * 1.12;
+      const s = new THREE.Mesh(strengGeo, stål);
+      s.scale.set(0.006 + (1 - t) * 0.004, 0.006, lengde);
+      s.position.set(0.11 + t * 1.26, KASSE - 0.055, -0.34 - lengde / 2);
+      strenger.add(s);
+    }
+    flygel.add(strenger);
+
+    /* Stemmenaglene. En massiv stemmestokk lå bare og skygget for
+       tangentene — og det er naglene som er poenget: det er her
+       stemmenøkkelen settes på, og her stemmingen faktisk skjer. */
+    const nagleGeo = new THREE.CylinderGeometry(0.0095, 0.0095, 0.075, 10);
+    /* En nagle er noen få piksler bred på skjermen. Å sikte på den er
+       ikke gøy — målt treffrate var rundt én prosent. Gripefeltet dekker
+       derfor hele strengen tonen hører til, som er et langt og lett mål,
+       og det er dessuten den naturlige tingen å ta tak i. */
+    const gripeGeo = new THREE.BoxGeometry(1, 1, 1);
+    const gripeMat = new THREE.MeshBasicMaterial({
+      transparent: true, opacity: 0, depthWrite: false
+    });
+    const nagler = new THREE.Group();
+    const gripefelt = new THREE.Group();
+    for (let i = 0; i < 58; i++) {
+      const t = i / 57;
+      const n = new THREE.Mesh(nagleGeo, stål);
+      /* To forskjøvne rader, slik de står på et ekte stemmebrett. Toppen
+         må stikke opp over strengene — både for å ligne, og for at det
+         skal gå an å treffe dem med pekeren. */
+      const rad = i % 2;
+      n.position.set(0.11 + t * 1.26, KASSE - 0.075, -0.3 - rad * 0.05);
+      nagler.add(n);
+
+      /* Samme utstrekning som strengen under, litt raust i høyden */
+      const lengde = 1.72 - t * 1.12;
+      const g = new THREE.Mesh(gripeGeo, gripeMat);
+      g.scale.set(0.0215, 0.14, lengde + 0.12);
+      g.position.set(0.11 + t * 1.26, KASSE - 0.09, -0.32 - lengde / 2);
+      gripefelt.add(g);
+    }
+    flygel.add(nagler);
+    flygel.add(gripefelt);
+
+    /* Dempefilten — den røde stripa Geir jobber rundt */
+    const stripe = new THREE.Mesh(new THREE.BoxGeometry(BREDDE * 0.8, 0.012, 0.04), filt);
+    stripe.position.set(BREDDE / 2, KASSE - 0.045, -0.62);
+    flygel.add(stripe);
+
+    /* ---------- Klaviatur ---------- */
+    const klaviatur = new THREE.Group();
+    const HVIT = 0.0225, ANTALL = 52;
+    const hvitGeo = new THREE.BoxGeometry(HVIT * 0.92, 0.018, 0.15);
+    const svartGeo = new THREE.BoxGeometry(HVIT * 0.55, 0.022, 0.095);
+    /* Mønsteret av svarte tangenter innen en oktav (C D E F G A H) */
+    const harSvartEtter = [true, true, false, true, true, true, false];
+    const start = (BREDDE - ANTALL * HVIT) / 2;
+
+    for (let i = 0; i < ANTALL; i++) {
+      const x = start + i * HVIT + HVIT / 2;
+      const h = new THREE.Mesh(hvitGeo, elfenben);
+      h.position.set(x, KASSE - 0.028, -0.085);
+      klaviatur.add(h);
+      /* Svart tangent i sprekken mot neste hvite */
+      if (i < ANTALL - 1 && harSvartEtter[(i + 5) % 7]) {
+        const s = new THREE.Mesh(svartGeo, ibenholt);
+        s.position.set(x + HVIT / 2, KASSE - 0.016, -0.11);
+        klaviatur.add(s);
+      }
+    }
+    flygel.add(klaviatur);
+
+    /* ---------- Lokket ----------
+       Egen gruppe med dreiepunkt langs bass-kanten (x = 0), så en rotasjon
+       om Z løfter diskantsiden slik et flygellokk faktisk åpner seg. */
+    const lokkGruppe = new THREE.Group();
+    lokkGruppe.position.set(0, KASSE, 0);
+    /* Framkanten settes bak klaviaturet — ellers ligger lokket over
+       tangentene, og de er halve poenget med å se på et flygel. */
+    const lokkShape = new THREE.Shape();
+    tegnOmriss(lokkShape, 0, 0.28);
+    const lokkMesh = new THREE.Mesh(liggende(lokkShape, 0.022, true), lakk);
+    lokkGruppe.add(lokkMesh);
+    flygel.add(lokkGruppe);
+
+    /* Støttepinnen som holder lokket oppe */
+    const pinne = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.011, 0.011, 0.78, 10),
+      new THREE.MeshStandardMaterial({ color: 0x6b4a2f, roughness: 0.6 })
+    );
+    pinne.position.set(BREDDE - 0.16, KASSE + 0.39, -0.95);
+    pinne.rotation.z = 0.2;
+    pinne.visible = false;
+    flygel.add(pinne);
+
+    /* ---------- Ben og pedaler ---------- */
+    function ben(x, z) {
+      const b = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.038, 0.72, 12), lakk);
+      b.position.set(x, -0.36, z);
+      flygel.add(b);
+    }
+    ben(0.16, -0.16);
+    ben(BREDDE - 0.16, -0.16);
+    ben(0.42, -LENGDE + 0.22);
+
+    const lyre = new THREE.Mesh(new THREE.BoxGeometry(0.19, 0.3, 0.05), lakk);
+    lyre.position.set(BREDDE / 2, -0.2, -0.12);
+    flygel.add(lyre);
+    for (let i = -1; i <= 1; i++) {
+      const p = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.012, 0.1), ramme);
+      p.position.set(BREDDE / 2 + i * 0.06, -0.33, -0.09);
+      flygel.add(p);
+    }
+
+    /* Sentrer hele instrumentet om origo */
+    flygel.position.set(-BREDDE / 2, 0, LENGDE / 2);
+
+    /* ---------- Interaksjon ---------- */
+    const ÅPEN = 0.92; /* radianer ≈ 53°, omtrent der støttepinnen står */
+    let lokkMål = ÅPEN, lokkNå = rolig ? ÅPEN : 0;
+    let seGjennom = false;
+
+    const knappLokk = document.getElementById('lokk');
+    const knappInnsyn = document.getElementById('innsyn');
+
+    knappLokk.addEventListener('click', () => {
+      const åpner = lokkMål === 0;  /* står åpent ved lasting */
+      lokkMål = åpner ? ÅPEN : 0;
+      knappLokk.textContent = åpner ? 'Lukk lokket' : 'Åpne lokket';
+      knappLokk.setAttribute('aria-pressed', String(åpner));
+      if (rolig) lokkNå = lokkMål; /* ingen animasjon om bruker ber om ro */
+    });
+
+    knappInnsyn.addEventListener('click', () => {
+      seGjennom = !seGjennom;
+      /* Kassa og lokket blir glass, så mekanikken kommer til syne */
+      for (const m of [lakk]) {
+        m.transparent = seGjennom;
+        m.opacity = seGjennom ? 0.22 : 1;
+        m.needsUpdate = true;
+      }
+      knappInnsyn.textContent = seGjennom ? 'Vis kassa igjen' : 'Se gjennom kassa';
+      knappInnsyn.setAttribute('aria-pressed', String(seGjennom));
+    });
+
+    document.getElementById('nullstill').addEventListener('click', () => {
+      rammeInn();
+    });
+
+    /* ---------- Lyd ----------
+       To «strenger» per tone, slik et ekte piano har. Referansen står
+       stille, den andre vrir vi på. Svevet du hører er ikke noe vi later
+       som — det oppstår av at to nesten like frekvenser blandes, akkurat
+       som i stua. */
+    let ctx = null, buss = null;
+
+    function lagKontekst() {
+      if (ctx) return ctx;
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ctx = new AC();
+      buss = ctx.createGain();
+      buss.gain.value = 0.9;
+      const komp = ctx.createDynamicsCompressor();
+      komp.threshold.value = -12;
+      komp.ratio.value = 8;
+      buss.connect(komp);
+      komp.connect(ctx.destination);
+      return ctx;
+    }
+
+    const DELTONER = [[1, 1], [2, 0.5], [3, 0.26], [4, 0.14]];
+
+    function startTone(grunn) {
+      const ac = lagKontekst();
+      if (!ac) return null;
+      if (ac.state !== 'running') ac.resume();
+
+      const t = ac.currentTime;
+      const ut = ac.createGain();
+      ut.gain.setValueAtTime(0, t);
+      ut.gain.linearRampToValueAtTime(0.2, t + 0.04);
+      ut.connect(buss);
+
+      const alle = [];   /* alt som må stoppes igjen */
+      const vribar = []; /* bare strengen vi vrir på */
+
+      for (let streng = 0; streng < 2; streng++) {
+        for (const [mult, amp] of DELTONER) {
+          const o = ac.createOscillator();
+          o.frequency.value = grunn * mult;
+          const g = ac.createGain();
+          g.gain.value = amp * 0.45;
+          o.connect(g);
+          g.connect(ut);
+          o.start(t);
+          alle.push(o);
+          if (streng === 0) vribar.push(o);
+        }
+      }
+
+      return {
+        settAvvik(cent) {
+          const n = ac.currentTime;
+          for (const o of vribar) o.detune.setTargetAtTime(cent, n, 0.015);
+        },
+        stopp() {
+          const n = ac.currentTime;
+          ut.gain.cancelScheduledValues(n);
+          ut.gain.setValueAtTime(ut.gain.value, n);
+          ut.gain.linearRampToValueAtTime(0, n + 1.4);
+          for (const o of alle) o.stop(n + 1.5);
+        }
+      };
+    }
+
+    /* ---------- Stemming ----------
+       Naglene er klikkbare. Dra opp eller ned, så vris strengen skarpere
+       eller dypere — og svevet forteller deg hvor nær du er. */
+    const NAVN = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'H'];
+    const stråle = new THREE.Raycaster();
+    const peker = new THREE.Vector2();
+
+    /* Eget materiale for den valgte strengen, så den kan lyse alene */
+    const valgtStreng = new THREE.MeshStandardMaterial({
+      color: 0xd8c6a6, roughness: 0.3, metalness: 1, emissive: 0x000000
+    });
+    const valgtNagle = new THREE.MeshStandardMaterial({
+      color: 0xf0dcb4, roughness: 0.25, metalness: 1, emissive: 0x3a1e10
+    });
+
+    let valgt = null;    /* { i, nagle, streng, grunn, midi } */
+    let avvik = 0;       /* cent fra ren stemming */
+    let tone = null;
+    let drar = false, dragY = 0, dragAvvik = 0;
+
+    const hud = document.getElementById('hud');
+    const hudTone = document.getElementById('hud-tone');
+    const hudTall = document.getElementById('hud-tall');
+    const hudNål = document.getElementById('hud-nal');
+    const hudStatus = document.getElementById('hud-status');
+
+    function midiTilFrekvens(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+
+    function velg(i) {
+      slipp();
+      const nagle = nagler.children[i];
+      const streng = strenger.children[i];
+      /* Midtregisteret — der både øret og mobilhøyttaleren henger med */
+      const midi = 48 + Math.round((i / 57) * 36);
+      valgt = { i, nagle, streng, grunn: midiTilFrekvens(midi), midi };
+
+      nagle.material = valgtNagle;
+      streng.material = valgtStreng;
+
+      /* Et lite forsprang, så det er noe å stemme bort fra */
+      avvik = (Math.random() < 0.5 ? -1 : 1) * (11 + Math.random() * 16);
+      tone = startTone(valgt.grunn);
+      if (tone) tone.settAvvik(avvik);
+
+      hudTone.textContent = NAVN[midi % 12] + (Math.floor(midi / 12) - 1);
+      hud.hidden = false;
+      oppdaterHud();
+    }
+
+    function slipp() {
+      if (!valgt) return;
+      valgt.nagle.material = stål;
+      valgt.streng.material = stål;
+      if (tone) tone.stopp();
+      tone = null;
+      valgt = null;
+      hud.hidden = true;
+    }
+
+    function oppdaterHud() {
+      const rent = Math.abs(avvik) < 2;
+      hudTall.textContent = (avvik > 0 ? '+' : '') + avvik.toFixed(1) + ' cent';
+      hudNål.style.left = (50 + Math.max(-50, Math.min(50, avvik)) ) + '%';
+      hud.classList.toggle('er-rent', rent);
+      hudStatus.textContent = rent
+        ? 'Ren — hør så svevet forsvant'
+        : (avvik > 0 ? 'For høy' : 'For lav');
+    }
+
+    /* Svevefrekvensen i hertz: hvor mange ganger i sekundet de to
+       strengene går inn og ut av fase. Den er det øret jakter på. */
+    function sveveHz() {
+      if (!valgt) return 0;
+      return Math.abs(valgt.grunn * (Math.pow(2, avvik / 1200) - 1));
+    }
+
+    const lerret = renderer.domElement;
+
+    function pekerFra(e) {
+      const r = lerret.getBoundingClientRect();
+      peker.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      peker.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+    }
+
+    lerret.addEventListener('pointerdown', (e) => {
+      pekerFra(e);
+      stråle.setFromCamera(peker, kamera);
+      const treff = stråle.intersectObjects(gripefelt.children, false);
+      if (!treff.length) return;
+
+      /* Nagle truffet: ta over dragingen fra kamerakontrollen */
+      kontroller.enabled = false;
+      kontroller.autoRotate = false;
+      const i = gripefelt.children.indexOf(treff[0].object);
+      if (!valgt || valgt.i !== i) {
+        velg(i);
+      } else if (tone) {
+        /* Samme nagle igjen: slå an på nytt. En stemmer slår tangenten
+           mellom hvert grep om nøkkelen — uten det har man ingenting å
+           lytte etter. */
+        tone.stopp();
+        tone = startTone(valgt.grunn);
+        if (tone) tone.settAvvik(avvik);
+      }
+      drar = true;
+      dragY = e.clientY;
+      dragAvvik = avvik;
+      /* Ikke alle pekere lar seg fange (syntetiske events, enkelte
+         penner) — dragingen klarer seg fint uten. */
+      try { lerret.setPointerCapture(e.pointerId); } catch (err) {}
+    });
+
+    lerret.addEventListener('pointermove', (e) => {
+      if (!drar) return;
+      /* Opp = skarpere, ned = dypere, som når man vrir nøkkelen */
+      avvik = Math.max(-50, Math.min(50, dragAvvik + (dragY - e.clientY) * 0.32));
+      if (tone) tone.settAvvik(avvik);
+      oppdaterHud();
+    });
+
+    function avsluttDrag(e) {
+      if (!drar) return;
+      drar = false;
+      kontroller.enabled = true;
+      try { lerret.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+    lerret.addEventListener('pointerup', avsluttDrag);
+    lerret.addEventListener('pointercancel', avsluttDrag);
+
+    document.getElementById('slipp').addEventListener('click', slipp);
+
+    /* ---------- Løkke ---------- */
+    addEventListener('resize', () => {
+      const gammelAspect = kamera.aspect;
+      kamera.aspect = innerWidth / innerHeight;
+      kamera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      /* Ble vinduet vesentlig smalere, må vi trekke oss unna igjen — men
+         bare da, så vi ikke rykker kameraet fra folk som holder på. */
+      if (kamera.aspect < gammelAspect * 0.8) rammeInn();
+    });
+
+    document.getElementById('laster').remove();
+
+    const klokke = new THREE.Clock();
+
+    renderer.setAnimationLoop(() => {
+      const tid = klokke.getElapsedTime();
+
+      /* Myk innhenting mot målvinkelen — billig fjæring uten bibliotek */
+      lokkNå += (lokkMål - lokkNå) * 0.09;
+      lokkGruppe.rotation.z = lokkNå;
+      pinne.visible = lokkNå > 0.35;
+
+      /* Den valgte strengen pulserer i takt med svevet. Ved ren stemming
+         er svevefrekvensen null, og gløden står stille — nøyaktig det
+         øret hører. Ingen jukse-animasjon: samme tall styrer begge. */
+      if (valgt) {
+        const hz = sveveHz();
+        const puls = 0.5 + 0.5 * Math.cos(2 * Math.PI * hz * tid);
+        const renhet = 1 - Math.min(1, Math.abs(avvik) / 25);
+        const styrke = 0.12 + 0.75 * puls;
+        valgtStreng.emissive.setRGB(
+          styrke * (1 - renhet * 0.45),
+          styrke * (0.4 + renhet * 0.5),
+          styrke * (0.12 + renhet * 0.3)
+        );
+        valgtNagle.emissive.setRGB(styrke * 0.5, styrke * 0.28, styrke * 0.1);
+      }
+
+      kontroller.update();
+      renderer.render(scene, kamera);
+    });
+  </script>
+</body>
+</html>
