@@ -315,4 +315,131 @@
   } else {
     revealed.forEach(function (el) { el.classList.add('is-visible'); });
   }
+
+  /* ---------- Galleri-lightboks ----------
+     Hvert galleri-kort er en vanlig lenke til fullbildet. Uten JS — eller i
+     en nettleser uten <dialog> — åpner den bare bildefila, som er godt nok.
+     Har vi begge deler, tar vi over klikket og viser bildet i en modal. */
+  var lightboks = document.querySelector('.lightboks');
+  var galleriLenker = tilListe(document.querySelectorAll('.galleri-lenke'));
+  if (lightboks && galleriLenker.length && typeof lightboks.showModal === 'function') {
+    var lbBilde = lightboks.querySelector('.lightboks-figur img');
+    var lbTekst = lightboks.querySelector('.lightboks-tekst');
+    var lbTeller = lightboks.querySelector('.lightboks-teller');
+    var naa = 0;
+    var apnetFra = null;
+
+    /* Alt-tekst og bildetekst bor i markupen — lightboksen låner dem, slik
+       at det bare finnes én kilde til hva hvert bilde viser. */
+    var bilder = galleriLenker.map(function (lenke) {
+      var img = lenke.querySelector('img');
+      var kort = lenke.parentNode;
+      var tekst = kort ? kort.querySelector('figcaption') : null;
+      return {
+        full: lenke.getAttribute('href'),
+        alt: img ? img.getAttribute('alt') : '',
+        tekst: tekst ? tekst.textContent.trim() : ''
+      };
+    });
+
+    /* Naboene hentes i bakgrunnen, så det ikke blir en hvit pause ved bla. */
+    function forhandslast(i) {
+      var b = bilder[(i + bilder.length) % bilder.length];
+      if (b) { var f = new Image(); f.src = b.full; }
+    }
+
+    function vis(i) {
+      naa = (i + bilder.length) % bilder.length;
+      var b = bilder[naa];
+      lbBilde.src = b.full;
+      lbBilde.alt = b.alt;
+      lbTekst.textContent = b.tekst;
+      lbTeller.textContent = (naa + 1) + ' av ' + bilder.length;
+      forhandslast(naa + 1);
+      forhandslast(naa - 1);
+    }
+
+    galleriLenker.forEach(function (lenke, i) {
+      lenke.addEventListener('click', function (e) {
+        /* La cmd/ctrl/shift-klikk åpne bildet i fane eller vindu som vanlig. */
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+        e.preventDefault();
+        apnetFra = lenke;
+        vis(i);
+        lightboks.showModal();
+      });
+    });
+
+    lightboks.querySelector('.lightboks-neste').addEventListener('click', function () { vis(naa + 1); });
+    lightboks.querySelector('.lightboks-forrige').addEventListener('click', function () { vis(naa - 1); });
+    lightboks.querySelector('.lightboks-lukk').addEventListener('click', function () { lightboks.close(); });
+
+    /* Esc håndterer <dialog> selv; her er det bare blaingen. */
+    lightboks.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); vis(naa + 1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); vis(naa - 1); }
+    });
+
+    /* Klikk i det tomme rommet rundt bildet lukker. Bildet selv og knappene
+       ligger dypere i treet og treffer derfor ikke denne testen. */
+    lightboks.addEventListener('click', function (e) {
+      if (e.target === lightboks || e.target.className === 'lightboks-figur') {
+        lightboks.close();
+      }
+    });
+
+    /* Sveip mellom bildene på touch */
+    var startX = 0, startY = 0, sveiper = false;
+    lightboks.addEventListener('touchstart', function (e) {
+      sveiper = e.touches.length === 1;
+      if (!sveiper) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    }, { passive: true });
+    lightboks.addEventListener('touchend', function (e) {
+      if (!sveiper) return;
+      sveiper = false;
+      var t = e.changedTouches[0];
+      var dx = t.clientX - startX;
+      var dy = t.clientY - startY;
+      /* Bare tydelig vannrette drag teller — ellers ville en loddrett
+         bevegelse for å lukke eller scrolle også bla i bildene. */
+      if (Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy) * 1.6) {
+        vis(naa + (dx < 0 ? 1 : -1));
+      }
+    }, { passive: true });
+
+    lightboks.addEventListener('close', function () {
+      lbBilde.removeAttribute('src');
+      if (apnetFra) { apnetFra.focus(); apnetFra = null; }
+    });
+  }
+
+  /* ---------- Til toppen-knapp ----------
+     Lenken virker på egen hånd; her styres bare når den er verdt å vise.
+     Terskelen er drøyt én skjermhøyde — da har man forlatt heroen og
+     har faktisk en vei å gå tilbake. */
+  var tilTopp = document.querySelector('.til-topp');
+  if (tilTopp) {
+    var toppVenter = false;
+    var vurderTopp = function () {
+      var langtNede = window.scrollY > window.innerHeight * 1.2;
+      tilTopp.classList.toggle('er-synlig', langtNede);
+      toppVenter = false;
+    };
+    window.addEventListener('scroll', function () {
+      if (!toppVenter) { toppVenter = true; requestAnimationFrame(vurderTopp); }
+    }, { passive: true });
+    vurderTopp();
+
+    /* href-en klarer seg selv uten JS. Har vi JS, tar vi klikket likevel:
+       da slipper vi å etterlate #topp i adressefeltet, og vi er ikke
+       avhengige av at nettleseren gidder å scrolle til en hash som
+       allerede står der — noe Safari er ujevn på. */
+    tilTopp.addEventListener('click', function (e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    });
+  }
+
 })();
