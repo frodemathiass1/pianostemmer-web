@@ -526,6 +526,43 @@ textarea:focus-visible {
 .til-topp { display: none; }
 
 
+/* Bare for skjermlesere — f.eks. varsel om at en lenke åpner ny fane */
+.kun-opplest {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Adressen i footeren, med kartnål */
+.kart-lenke {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+/* Tekstlinja er bare ~24 px høy. Pseudo-elementet gir tommelen noe å
+   treffe uten å skyve på linjene rundt. Skjevt med vilje: over står bare
+   navnet, men rett under ligger telefonnummeret — en jevn utvidelse
+   stjal de øverste pikslene av det. */
+.kart-lenke::after {
+  content: '';
+  position: absolute;
+  inset: -0.65rem -0.35rem 0;
+}
+.kart-pin {
+  width: 0.95em;
+  height: 0.95em;
+  flex: none;
+  /* Nålen har tyngdepunktet øverst; et hår ned treffer tekstlinja bedre */
+  transform: translateY(0.04em);
+}
+
+
 /* Scroll-reveal — kun når JS kjører; av ved redusert bevegelse */
 html.js .reveal {
   opacity: 0;

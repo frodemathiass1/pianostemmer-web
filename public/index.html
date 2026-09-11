@@ -35,6 +35,7 @@
       "addressLocality": "Eidsberg",
       "addressCountry": "NO"
     },
+    "hasMap": "https://www.google.com/maps/search/?api=1&query=Rakkestadveien+1244%2C+1880+Eidsberg",
     "areaServed": ["Østfold", "Akershus"],
     "makesOffer": {
       "@type": "Offer",
@@ -246,8 +247,14 @@
             <input id="epost" name="epost" type="email" required autocomplete="email">
           </p>
           <p>
-            <label for="sted">Sted</label>
-            <input id="sted" name="sted" type="text" required autocomplete="address-level2" placeholder="F.eks. Mysen">
+            <label for="sted">Adresse</label>
+            <!-- name="sted" står med vilje: Netlify Forms samler innsendinger
+                 per feltnavn, og et nytt navn ville splittet kolonnen på tvers
+                 av gamle og nye henvendelser. Det brukeren ser og fyller ut er
+                 en full adresse. -->
+            <input id="sted" name="sted" type="text" required
+                   autocomplete="street-address"
+                   placeholder="Storgata 12, 1850 Mysen">
           </p>
         </div>
         <p>
@@ -286,7 +293,12 @@
     <img src="assets/logo-lys.svg" alt="" class="footer-logo">
     <p>
       Pianostemmer'n · Geir Barlaup<br>
-      Rakkestadveien 1244, 1880 Eidsberg<br>
+      <!-- Søk på adressestreng framfor koordinater: en gjettet koordinat
+           peker på feil sted, et adressesøk finner alltid fram. -->
+      <a class="kart-lenke" href="https://www.google.com/maps/search/?api=1&amp;query=Rakkestadveien+1244%2C+1880+Eidsberg" target="_blank" rel="noopener">
+        <svg class="kart-pin" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/>
+        </svg>Rakkestadveien 1244, 1880 Eidsberg<span class="kun-opplest"> — vis i kart, åpnes i ny fane</span></a><br>
       <a href="tel:+4792214793">922 14 793</a> ·
       <a href="mailto:geir_barlaup@hotmail.com">geir_barlaup@hotmail.com</a>
     </p>
